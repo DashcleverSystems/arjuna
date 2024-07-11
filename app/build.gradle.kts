@@ -1,9 +1,18 @@
+import com.google.protobuf.gradle.id
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.google.protobuf)
 }
 
+
 android {
+
+    sourceSets.getByName("main") {
+        java.srcDirs(file("${protobuf.generatedFilesBaseDir}/java"))
+    }
+
     namespace = "io.arjuna"
     compileSdk = 34
 
@@ -58,6 +67,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.javalite)
 
     testImplementation(libs.junit)
 
@@ -68,4 +79,19 @@ dependencies {
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.27.2"
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                id("java") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }
