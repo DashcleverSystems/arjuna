@@ -9,10 +9,6 @@ class SimpleViewModelFactory<T : ViewModel>(
 
     override fun <K : ViewModel> create(modelClass: Class<K>): K {
         val viewModel = supplier.invoke()
-        if (viewModel::class.java == modelClass) {
-            return viewModel as K
-        } else {
-            error("${this::class} can not create view model of $modelClass")
-        }
+        return viewModel as? K ?: error("${this::class} can not create view model of $modelClass")
     }
 }
