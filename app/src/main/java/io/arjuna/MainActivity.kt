@@ -12,34 +12,38 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import io.arjuna.proto.BlockedWebsite
 import io.arjuna.proto.BlockedWebsites
 import io.arjuna.ui.theme.ArjunaTheme
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import io.arjuna.viewmodel.SimpleViewModelFactory
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: ViewModel by viewModels()
+    private val blockedWebsitesViewModel by
+    viewModels<BlockedWebsitesViewModel>(factoryProducer = {
+        SimpleViewModelFactory {
+            BlockedWebsitesViewModel(application.blockedWebsitesStore)
+        }
+    })
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.viewModelScope.launch(Dispatchers.IO) {
-            applicationContext.blockedWebsitesStore.updateData { currentState: BlockedWebsites ->
-                val xd = BlockedWebsite.newBuilder()
-                    .setDomain("test")
-                    .build()
-                currentState.toBuilder()
-                    .addWebsites(xd)
-                    .build()
-            }
-        }
         enableEdgeToEdge()
+
+
         setContent {
+
+            val blockedWebsites: Set<BlockedWebsitesViewModel.BlockedWebsite>
+                    by blockedWebsitesViewModel.blockedWebsites.collectAsState()
+
             ArjunaTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     Column(
@@ -48,7 +52,8 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        WebsitesBlockingCard()
+
+                        BlockedWebsitesCard(blockedWebsites)
                     }
                 }
             }
@@ -57,8 +62,24 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun WebsitesBlockingCard() {
-    Card {
-        Text(text = "Here we will allow blocking any website")
+fun BlockedWebsitesCard(
+    blockedWebsites: Set<BlockedWebsitesViewModel.BlockedWebsite>
+) {
+    blockedWebsites.forEach {
+        Card {
+            Text(text = it.mainDomain)
+        }
+    }
+}
+
+class BlockedWebsitesViewModel(private val dataStore: DataStore<BlockedWebsites>) :
+    ViewModel() {
+
+    data class BlockedWebsite(val mainDomain: String)
+
+    private val _blockedWebsites = MutableStateFlow(emptySet<BlockedWebsite>())
+    public val blockedWebsites: StateFlow<Set<BlockedWebsite>> = _blockedWebsites.asStateFlow()
+
+    init {
     }
 }
