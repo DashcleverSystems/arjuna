@@ -1,4 +1,4 @@
-package io.arjuna
+package io.arjuna.blockedwebsites
 
 import android.content.Context
 import androidx.datastore.core.CorruptionException
@@ -12,13 +12,13 @@ import java.io.OutputStream
 
 object BlockedWebsitesSerializer : Serializer<BlockedWebsites> {
 
-    override val defaultValue = BlockedWebsites.getDefaultInstance()
+    override val defaultValue: BlockedWebsites = BlockedWebsites.getDefaultInstance()
 
     override suspend fun readFrom(input: InputStream): BlockedWebsites {
         try {
             return BlockedWebsites.parseFrom(input)
         } catch (exception: InvalidProtocolBufferException) {
-            throw CorruptionException("Cannot read proto.", exception)
+            throw CorruptionException("Cannot read proto. Blocked websites data", exception)
         }
     }
 
