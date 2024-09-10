@@ -2,16 +2,17 @@ package io.arjuna.blockedwebsites
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
-import android.content.Context
+import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import io.arjuna.logging.ARJUNA_TAG
 
 class UrlInterceptorService(
+
     private val onBlockedWebsite: () -> Unit = {}
 ) : AccessibilityService() {
 
     private val supportedBrowsers = InMemorySupportedBrowserProvider.supportedBrowser
-    private val blockedWeb
 
     override fun onServiceConnected() {
         this.serviceInfo = serviceInfo.apply {
@@ -25,17 +26,18 @@ class UrlInterceptorService(
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
-        val parentNodeInfo = event.source ?: return
-
-        val packageName = event.packageName.toString()
-        val supportedBrowser = supportedBrowsers.firstOrNull { it.packageName == packageName }
+        val parentNodeInfo = event.source
             ?: return
 
-        val capturedUrl = captureUrl(parentNodeInfo, supportedBrowser)
+        val packageName = event.packageName.toString()
+        val browser = supportedBrowsers.firstOrNull { it.packageName == packageName }
+            ?: return
+
+        val capturedUrl = captureUrl(parentNodeInfo, browser)
             ?: return
 
         val eventTime = event.eventTime
-        println("Detected blocked webiste $capturedUrl on $eventTime")
+        Log.d(ARJUNA_TAG, "Detected website to block $capturedUrl on $eventTime")
         onBlockedWebsite.invoke()
     }
 

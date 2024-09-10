@@ -1,4 +1,5 @@
 <accessibility-service
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:canRetrieveWindowContent="true"
-    android:settingsActivity="io.arjuna.MainActivity" />
+    android:settingsActivity="io.arjuna.MainActivity"
+    />
