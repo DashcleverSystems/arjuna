@@ -33,6 +33,19 @@ class BlockedWebsitesViewModel(private val blockedWebsitesStore: DataStore<Block
         }
     }
 
+    fun removeWebsiteToBlock(website: BlockedWebsite) {
+        viewModelScope.launch {
+            blockedWebsitesStore.updateData { currentData: BlockedWebsitesProto ->
+                val websiteToRemove =
+                    currentData.websitesList.firstOrNull { it.domain == website.mainDomain }
+                        ?: return@updateData currentData
+                val newDataBuilder = BlockedWebsitesProto.newBuilder()
+                newDataBuilder.addAllWebsites(currentData.websitesList - websiteToRemove)
+                return@updateData newDataBuilder.build()
+            }
+        }
+    }
+
     private fun BlockedWebsitesProto.contains(website: BlockedWebsite): Boolean =
         this.websitesList.any { it.domain == website.mainDomain }
 }

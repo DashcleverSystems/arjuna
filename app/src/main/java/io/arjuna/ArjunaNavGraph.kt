@@ -26,13 +26,20 @@ fun ArjunaNavGraph(
         composable(ArjunaDestinations.HOME) {
             val blockedWebsites by blockedWebsitesViewModel.blockedWebsites
                 .collectAsState(initial = emptySet())
-            HomeComposable(blockedWebsites) { websiteToBlock: String? ->
-                if (websiteToBlock != null) {
-                    blockedWebsitesViewModel.addWebsiteToBlock(
-                        BlockedWebsitesViewModel.BlockedWebsite(websiteToBlock)
+            HomeComposable(blockedWebsites,
+                onWebsiteRemove = { websiteToRemove ->
+                    blockedWebsitesViewModel.removeWebsiteToBlock(
+                        websiteToRemove
                     )
+                },
+                onWebsiteAdd = { websiteToBlock: String? ->
+                    if (websiteToBlock != null) {
+                        blockedWebsitesViewModel.addWebsiteToBlock(
+                            BlockedWebsitesViewModel.BlockedWebsite(websiteToBlock)
+                        )
+                    }
                 }
-            }
+            )
         }
     }
 }

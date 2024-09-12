@@ -26,7 +26,8 @@ import io.arjuna.blockedwebsites.BlockedWebsitesViewModel
 @Composable
 fun HomeComposable(
     blockedWebsites: Set<BlockedWebsitesViewModel.BlockedWebsite>,
-    onDialogClose: (String?) -> Unit
+    onWebsiteRemove: (BlockedWebsitesViewModel.BlockedWebsite) -> Unit,
+    onWebsiteAdd: (String?) -> Unit
 ) {
     Scaffold(
         modifier = Modifier
@@ -40,9 +41,9 @@ fun HomeComposable(
                 .padding(innerPadding),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            BlockedWebsitesComposable(blockedWebsites) {
+            BlockedWebsitesComposable(blockedWebsites, { onWebsiteRemove(it) }) {
                 var showAddDialog by remember { mutableStateOf(false) }
-                AddDialogComposable(showAddDialog) { showAddDialog = false; onDialogClose(it) }
+                AddDialogComposable(showAddDialog) { showAddDialog = false; onWebsiteAdd(it) }
 
                 SmallFloatingActionButton(
                     shape = RoundedCornerShape(100),
