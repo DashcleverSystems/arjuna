@@ -21,12 +21,18 @@ fun ArjunaNavGraph(
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier
+        modifier = modifier,
     ) {
         composable(ArjunaDestinations.HOME) {
             val blockedWebsites by blockedWebsitesViewModel.blockedWebsites
                 .collectAsState(initial = emptySet())
-            HomeComposable(blockedWebsites)
+            HomeComposable(blockedWebsites) { websiteToBlock: String? ->
+                if (websiteToBlock != null) {
+                    blockedWebsitesViewModel.addWebsiteToBlock(
+                        BlockedWebsitesViewModel.BlockedWebsite(websiteToBlock)
+                    )
+                }
+            }
         }
     }
 }
