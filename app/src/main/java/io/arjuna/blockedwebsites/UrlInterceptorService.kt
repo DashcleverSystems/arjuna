@@ -2,15 +2,29 @@ package io.arjuna.blockedwebsites
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
+import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import io.arjuna.MainActivity
+import io.arjuna.blockedwebsites.BlockingWebsitesService.UrlChanged
 import io.arjuna.logging.ARJUNA_TAG
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
-class UrlInterceptorService(
+class UrlInterceptorService : AccessibilityService() {
 
-    private val onBlockedWebsite: () -> Unit = {}
-) : AccessibilityService() {
+    private val blockingWebsitesService by lazy {
+        val repository = BlockedWebsiteRepository(
+            CoroutineScope(Dispatchers.Main + SupervisorJob()),
+            baseContext.blockedWebsitesStore
+        )
+        BlockingWebsitesService(
+            repository,
+            CoroutineScope(Dispatchers.Main + SupervisorJob())
+        )
+    }
 
     private val supportedBrowsers = InMemorySupportedBrowserProvider.supportedBrowser
 
@@ -35,10 +49,14 @@ class UrlInterceptorService(
 
         val capturedUrl = captureUrl(parentNodeInfo, browser)
             ?: return
+        Log.d(ARJUNA_TAG, "Captured url: $capturedUrl")
 
-        val eventTime = event.eventTime
-        Log.d(ARJUNA_TAG, "Detected website to block $capturedUrl on $eventTime")
-        onBlockedWebsite.invoke()
+        blockingWebsitesService.onUrlChange(UrlChanged(capturedUrl)) {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            startActivity(intent)
+        }
     }
 
     private fun captureUrl(

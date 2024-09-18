@@ -1,51 +1,30 @@
 package io.arjuna.blockedwebsites
 
-import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
-import io.arjuna.proto.BlockedWebsites as BlockedWebsitesProto
 
-class BlockedWebsitesViewModel(private val blockedWebsitesStore: DataStore<BlockedWebsitesProto>) :
-    ViewModel() {
+class BlockedWebsitesViewModel(
+    private val blockedWebsitesRepository: BlockedWebsiteRepository
+) : ViewModel() {
 
     data class BlockedWebsite(val mainDomain: String)
 
     val blockedWebsites: Flow<Set<BlockedWebsite>> =
-        blockedWebsitesStore.data.map { blockedWebsites ->
-            blockedWebsites.websitesList.map { BlockedWebsite(it.domain) }.toSet()
-        }
+        blockedWebsitesRepository.blockedWebsites
+            .map { blockedWebsites: Set<io.arjuna.blockedwebsites.BlockedWebsite> ->
+                blockedWebsites.map { BlockedWebsite(it.mainDomain) }.toSet()
+            }
 
     fun addWebsiteToBlock(website: BlockedWebsite) {
-        viewModelScope.launch {
-            blockedWebsitesStore.updateData { currentData: BlockedWebsitesProto ->
-                if (currentData.contains(website)) return@updateData currentData
-                val websiteToBlock =
-                    io.arjuna.proto.BlockedWebsite.newBuilder()
-                        .setDomain(website.mainDomain)
-                        .build()
-                val newDataBuilder = BlockedWebsitesProto.newBuilder()
-                newDataBuilder.addAllWebsites(currentData.websitesList + websiteToBlock)
-                return@updateData newDataBuilder.build()
-            }
-        }
+        blockedWebsitesRepository.addWebsiteToBlock(
+            io.arjuna.blockedwebsites.BlockedWebsite(website.mainDomain)
+        )
     }
 
     fun removeWebsiteToBlock(website: BlockedWebsite) {
-        viewModelScope.launch {
-            blockedWebsitesStore.updateData { currentData: BlockedWebsitesProto ->
-                val websiteToRemove =
-                    currentData.websitesList.firstOrNull { it.domain == website.mainDomain }
-                        ?: return@updateData currentData
-                val newDataBuilder = BlockedWebsitesProto.newBuilder()
-                newDataBuilder.addAllWebsites(currentData.websitesList - websiteToRemove)
-                return@updateData newDataBuilder.build()
-            }
-        }
+        blockedWebsitesRepository.removeWebsiteToBlock(
+            io.arjuna.blockedwebsites.BlockedWebsite(website.mainDomain)
+        )
     }
-
-    private fun BlockedWebsitesProto.contains(website: BlockedWebsite): Boolean =
-        this.websitesList.any { it.domain == website.mainDomain }
 }
