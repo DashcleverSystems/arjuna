@@ -20,13 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.arjuna.blockedwebsites.AddDialogComposable
+import io.arjuna.blockedwebsites.BlockedWebsite
 import io.arjuna.blockedwebsites.BlockedWebsitesComposable
-import io.arjuna.blockedwebsites.BlockedWebsitesViewModel
 
 @Composable
 fun HomeComposable(
-    blockedWebsites: Set<BlockedWebsitesViewModel.BlockedWebsite>,
-    onWebsiteRemove: (BlockedWebsitesViewModel.BlockedWebsite) -> Unit,
+    blockedWebsites: Set<BlockedWebsite>,
+    onWebsiteRemove: (BlockedWebsite) -> Unit,
     onWebsiteAdd: (String?) -> Unit
 ) {
     Scaffold(

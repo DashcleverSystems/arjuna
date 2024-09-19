@@ -22,8 +22,8 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BlockedWebsitesComposable(
-    blockedWebsites: Set<BlockedWebsitesViewModel.BlockedWebsite>,
-    onWebsiteRemove: (BlockedWebsitesViewModel.BlockedWebsite) -> Unit = {},
+    blockedWebsites: Set<BlockedWebsite>,
+    onWebsiteRemove: (BlockedWebsite) -> Unit = {},
     addButtonProvider: @Composable () -> Unit = {}
 ) {
     ElevatedCard(

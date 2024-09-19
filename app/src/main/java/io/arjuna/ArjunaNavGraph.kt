@@ -8,6 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import io.arjuna.blockedwebsites.BlockedWebsite
 import io.arjuna.blockedwebsites.BlockedWebsitesViewModel
 
 @Composable
@@ -27,15 +28,13 @@ fun ArjunaNavGraph(
             val blockedWebsites by blockedWebsitesViewModel.blockedWebsites
                 .collectAsState(initial = emptySet())
             HomeComposable(blockedWebsites,
-                onWebsiteRemove = { websiteToRemove ->
-                    blockedWebsitesViewModel.removeWebsiteToBlock(
-                        websiteToRemove
-                    )
+                onWebsiteRemove = { websiteToRemove: BlockedWebsite ->
+                    blockedWebsitesViewModel.removeWebsiteToBlock(websiteToRemove)
                 },
                 onWebsiteAdd = { websiteToBlock: String? ->
                     if (websiteToBlock != null) {
                         blockedWebsitesViewModel.addWebsiteToBlock(
-                            BlockedWebsitesViewModel.BlockedWebsite(websiteToBlock)
+                            BlockedWebsite(mainDomain = websiteToBlock)
                         )
                     }
                 }

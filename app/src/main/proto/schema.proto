@@ -5,8 +5,13 @@ package io.arjuna.proto;
 option java_package = "io.arjuna.proto";
 option java_multiple_files = true;
 
+message UUID {
+  string value = 1;
+}
+
 message BlockedWebsite {
   string domain = 1;
+  UUID identifier = 2;
 }
 
 message BlockedWebsites {
