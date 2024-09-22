@@ -17,3 +17,25 @@ message BlockedWebsite {
 message BlockedWebsites {
   repeated BlockedWebsite websites = 1;
 }
+
+message WebsiteLock {
+  UUID websiteIdentifier = 1;
+  int32 from = 2;
+  int32 to = 3;
+  repeated Weekday onDays = 4;
+  bool isActive = 5;
+}
+
+message WebsiteLocks {
+  repeated WebsiteLock locks = 1;
+}
+
+enum Weekday {
+  MONDAY = 0;
+  TUESDAY = 1;
+  WEDNESDAY = 2;
+  THURSDAY = 3;
+  FRIDAY = 4;
+  SATURDAY = 5;
+  SUNDAY = 6;
+}
