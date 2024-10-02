@@ -12,6 +12,7 @@ androidxNavigation = "2.8.0"
 composeBom = "2024.09.01"
 protobuf = "0.9.4"
 protobufJavalite = "4.27.2"
+jetbrainsKotlinJvm = "1.9.0"
 
 
 [libraries]
@@ -39,3 +40,4 @@ protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.
 android-application = { id = "com.android.application", version.ref = "agp" }
 jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-protobuf = { id = "com.google.protobuf", version.ref = "protobuf" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }

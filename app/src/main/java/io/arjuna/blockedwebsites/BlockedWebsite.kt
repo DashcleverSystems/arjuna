@@ -1,7 +1,6 @@
 package io.arjuna.blockedwebsites
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,65 +11,56 @@ import androidx.compose.material.icons.sharp.Clear
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import io.arjuna.composables.MainElevatedCardModifier
+import io.arjuna.composables.OutlinedCard
+import io.arjuna.composables.OutlinedCards
 
 @Composable
-fun BlockedWebsitesComposable(
+fun BlockedWebsites(
     blockedWebsites: Set<BlockedWebsite>,
     onWebsiteRemove: (BlockedWebsite) -> Unit = {},
     addButtonProvider: @Composable () -> Unit = {}
 ) {
-    ElevatedCard(
-        Modifier
-            .padding(4.dp)
-            .fillMaxWidth(0.9f)
-            .wrapContentWidth(Alignment.CenterHorizontally)
-    ) {
-        Text(
-            "Blocked websites",
-            Modifier.padding(start = 10.dp, top = 10.dp),
-            fontWeight = FontWeight.Bold
-        )
-        blockedWebsites.ifEmpty {
-            BlockedWebsiteCard {
-                BlockedWebsiteText("Nothing to protect from yet!")
-            }
-        }
-        blockedWebsites.forEach { blockedWebsite ->
-            BlockedWebsiteCard {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    BlockedWebsiteText(blockedWebsite.mainDomain)
-                    RemoveButton { onWebsiteRemove(blockedWebsite) }
+    ElevatedCard(MainElevatedCardModifier.wrapContentWidth(Alignment.CenterHorizontally)) {
+        Text("Websites", Modifier.padding(4.dp), fontWeight = FontWeight.Bold)
+        OutlinedCards(
+            blockedWebsites,
+            onEmptyContent = {
+                OutlinedCard {
+                    WebsiteText("Nothing to protect from yet!")
                 }
-            }
+            },
+            elementComposable = { Website(it, onWebsiteRemove) },
+            additionalContent = addButtonProvider
+        )
+    }
+}
+
+@Composable
+private fun Website(
+    website: BlockedWebsite,
+    onRemove: (BlockedWebsite) -> Unit
+) {
+    OutlinedCard {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            WebsiteText(website.mainDomain)
+            RemoveButton { onRemove.invoke(website) }
         }
-        addButtonProvider()
     }
 }
 
 @Composable
-private fun BlockedWebsiteCard(content: @Composable ColumnScope.() -> Unit) {
-    OutlinedCard(
-        Modifier
-            .padding(10.dp)
-            .fillMaxWidth(0.7f)
-    ) {
-        content()
-    }
-}
-
-@Composable
-private fun BlockedWebsiteText(domain: String) {
+private fun WebsiteText(domain: String) {
     Text(
         domain,
         Modifier
