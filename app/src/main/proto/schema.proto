@@ -18,18 +18,6 @@ message BlockedWebsites {
   repeated BlockedWebsite websites = 1;
 }
 
-message WebsiteLock {
-  UUID websiteIdentifier = 1;
-  int32 from = 2;
-  int32 to = 3;
-  repeated Weekday onDays = 4;
-  bool isActive = 5;
-}
-
-message WebsiteLocks {
-  repeated WebsiteLock locks = 1;
-}
-
 enum Weekday {
   MONDAY = 0;
   TUESDAY = 1;
@@ -38,4 +26,19 @@ enum Weekday {
   FRIDAY = 4;
   SATURDAY = 5;
   SUNDAY = 6;
+}
+
+message Schedule {
+  UUID identifier = 1;
+  string name = 2;
+  repeated UUID websiteIdentifiers = 3;
+  repeated Weekday onDays = 4;
+  int32 fromHour = 5;
+  int32 fromMinute = 6;
+  int32 toHour = 7;
+  int32 toMinute = 8;
+}
+
+message Schedules {
+  repeated Schedule schedules = 1;
 }

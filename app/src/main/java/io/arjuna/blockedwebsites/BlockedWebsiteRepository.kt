@@ -8,12 +8,13 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import io.arjuna.proto.BlockedWebsite as BlockedWebsiteProto
 import io.arjuna.proto.BlockedWebsites as BlockedWebsitesProto
-import io.arjuna.proto.UUID as UUIDProto
 
 data class BlockedWebsite(
-    val identifier: UUID = UUID.randomUUID(),
+    val identifier: Id = Id(),
     val mainDomain: String
-)
+) {
+    data class Id(val uuid: UUID = UUID.randomUUID())
+}
 
 class BlockedWebsiteRepository(
     private val coroutineScope: CoroutineScope,
@@ -21,7 +22,12 @@ class BlockedWebsiteRepository(
 ) {
     val blockedWebsites: Flow<Set<BlockedWebsite>> =
         dataStore.data.map { blockedWebsites ->
-            blockedWebsites.websitesList.map { BlockedWebsite(it.identifier.toUUID(), it.domain) }
+            blockedWebsites.websitesList.map {
+                BlockedWebsite(
+                    BlockedWebsite.Id(it.identifier.toUUID()),
+                    it.domain
+                )
+            }
                 .toSet()
         }
 
@@ -41,7 +47,7 @@ class BlockedWebsiteRepository(
             dataStore.updateData { currentData: BlockedWebsitesProto ->
                 val websiteToRemove =
                     currentData.websitesList.firstOrNull { it: BlockedWebsiteProto ->
-                        it.identifier.toUUID() == website.identifier
+                        it.identifier.toUUID() == website.identifier.uuid
                     } ?: return@updateData currentData
                 val newDataBuilder = BlockedWebsitesProto.newBuilder()
                 newDataBuilder.addAllWebsites(currentData.websitesList - websiteToRemove)
@@ -49,19 +55,4 @@ class BlockedWebsiteRepository(
             }
         }
     }
-
-    private fun BlockedWebsitesProto.contains(website: BlockedWebsite): Boolean =
-        this.websitesList.any { it.domain == website.mainDomain }
-
-    private fun UUID.toProto(): UUIDProto = UUIDProto.newBuilder()
-        .setValue(this.toString())
-        .build()
-
-    private fun UUIDProto.toUUID(): UUID = UUID.fromString(this.value)
-
-    private fun BlockedWebsite.toProto(): BlockedWebsiteProto =
-        BlockedWebsiteProto.newBuilder().apply {
-            this.domain = this@toProto.mainDomain
-            this.identifier = this@toProto.identifier.toProto()
-        }.build()
 }
