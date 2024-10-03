@@ -8,15 +8,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.Dp
-import io.arjuna.websites.WebsiteRepository
-import io.arjuna.websites.WebsitesViewModel
-import io.arjuna.websites.blockedWebsitesStore
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
 import io.arjuna.ui.theme.ArjunaTheme
 import io.arjuna.viewmodel.SimpleViewModelFactory
+import io.arjuna.websites.WebsiteRepository
+import io.arjuna.websites.WebsitesViewModel
+import io.arjuna.websites.blockedWebsitesStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
@@ -53,10 +52,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ArjunaTheme {
-                Scaffold(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(top = Dp(30F)),
-                    topBar = { TopBarComposable() }
+                Scaffold(modifier = Modifier.fillMaxSize(), topBar = { TopBarComposable() }
                 ) { innerPadding ->
                     ArjunaNavGraph(
                         websitesViewModel,
