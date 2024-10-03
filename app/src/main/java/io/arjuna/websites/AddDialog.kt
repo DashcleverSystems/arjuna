@@ -1,4 +1,4 @@
-package io.arjuna.blockedwebsites
+package io.arjuna.websites
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 
 @Composable
-fun AddDialogComposable(
+fun AddDialog(
     showDialog: Boolean,
     onClose: (String?) -> Unit
 ) {

@@ -1,4 +1,4 @@
-package io.arjuna.blockedwebsites
+package io.arjuna.websites
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -22,15 +22,15 @@ import io.arjuna.composables.OutlinedCard
 import io.arjuna.composables.OutlinedCards
 
 @Composable
-fun BlockedWebsites(
-    blockedWebsites: Set<BlockedWebsite>,
-    onWebsiteRemove: (BlockedWebsite) -> Unit = {},
+fun Websites(
+    websites: Set<Website>,
+    onWebsiteRemove: (Website) -> Unit = {},
     addButtonProvider: @Composable () -> Unit = {}
 ) {
     ElevatedCard(MainElevatedCardModifier.wrapContentWidth(Alignment.CenterHorizontally)) {
         Text("Websites", Modifier.padding(4.dp), fontWeight = FontWeight.Bold)
         OutlinedCards(
-            blockedWebsites,
+            websites,
             onEmptyContent = {
                 OutlinedCard {
                     WebsiteText("Nothing to protect from yet!")
@@ -44,8 +44,8 @@ fun BlockedWebsites(
 
 @Composable
 private fun Website(
-    website: BlockedWebsite,
-    onRemove: (BlockedWebsite) -> Unit
+    website: Website,
+    onRemove: (Website) -> Unit
 ) {
     OutlinedCard {
         Row(

@@ -1,6 +1,6 @@
 package io.arjuna.schedule.infra.proto
 
-import io.arjuna.blockedwebsites.BlockedWebsite
+import io.arjuna.websites.Website
 import io.arjuna.proto.toJavaUUID
 import io.arjuna.proto.toProto
 import io.arjuna.schedule.domain.Hour
@@ -19,7 +19,7 @@ fun ScheduleProto.toDomain(): Schedule {
     return Schedule(
         identifier = Schedule.Id(this.identifier.toJavaUUID()),
         name = this.name,
-        websites = this.websiteIdentifiersList.map { BlockedWebsite.Id(it.toJavaUUID()) }.toSet(),
+        websites = this.websiteIdentifiersList.map { Website.Id(it.toJavaUUID()) }.toSet(),
         onDays = this.onDaysList.map { it.toDomain() }.toSet(),
         from = this.fromHour.Hour() with this.fromMinute.Minute(),
         to = this.toHour.Hour() with this.toMinute.Minute(),

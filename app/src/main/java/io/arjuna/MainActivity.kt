@@ -9,9 +9,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
-import io.arjuna.blockedwebsites.BlockedWebsiteRepository
-import io.arjuna.blockedwebsites.BlockedWebsitesViewModel
-import io.arjuna.blockedwebsites.blockedWebsitesStore
+import io.arjuna.websites.WebsiteRepository
+import io.arjuna.websites.WebsitesViewModel
+import io.arjuna.websites.blockedWebsitesStore
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
@@ -22,14 +22,14 @@ import kotlinx.coroutines.Dispatchers
 
 class MainActivity : ComponentActivity() {
 
-    private val blockedWebsitesViewModel by
-    viewModels<BlockedWebsitesViewModel>(factoryProducer = {
+    private val websitesViewModel by
+    viewModels<WebsitesViewModel>(factoryProducer = {
         SimpleViewModelFactory {
-            val repository = BlockedWebsiteRepository(
+            val repository = WebsiteRepository(
                 CoroutineScope(Dispatchers.Main),
                 application.blockedWebsitesStore
             )
-            BlockedWebsitesViewModel(repository)
+            WebsitesViewModel(repository)
         }
     })
 
@@ -40,7 +40,7 @@ class MainActivity : ComponentActivity() {
                 CoroutineScope(Dispatchers.Main),
                 application.schedulesStore
             )
-            val websiteRepository = BlockedWebsiteRepository(
+            val websiteRepository = WebsiteRepository(
                 CoroutineScope(Dispatchers.Main),
                 application.blockedWebsitesStore
             )
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
                     topBar = { TopBarComposable() }
                 ) { innerPadding ->
                     ArjunaNavGraph(
-                        blockedWebsitesViewModel,
+                        websitesViewModel,
                         schedulesViewModel,
                         Modifier.padding(innerPadding)
                     )

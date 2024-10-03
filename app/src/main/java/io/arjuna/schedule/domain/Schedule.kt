@@ -1,13 +1,13 @@
 package io.arjuna.schedule.domain
 
-import io.arjuna.blockedwebsites.BlockedWebsite
+import io.arjuna.websites.Website
 import java.util.UUID
 
 
 class Schedule(
     var name: String = "Schedule lock",
     val identifier: Id = Id(),
-    var websites: Set<BlockedWebsite.Id>,
+    var websites: Set<Website.Id>,
     var onDays: Set<Weekday>,
     var from: Time,
     var to: Time

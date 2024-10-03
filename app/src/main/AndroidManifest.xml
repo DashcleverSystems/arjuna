@@ -23,7 +23,7 @@
             </intent-filter>
         </activity>
         <service
-            android:name=".blockedwebsites.UrlInterceptorService"
+            android:name=".websites.UrlInterceptorService"
             android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>

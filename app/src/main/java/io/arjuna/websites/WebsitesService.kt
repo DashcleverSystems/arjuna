@@ -1,12 +1,12 @@
-package io.arjuna.blockedwebsites
+package io.arjuna.websites
 
 import android.util.Log
 import io.arjuna.logging.ARJUNA_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class BlockingWebsitesService(
-    private val blockedWebsiteRepository: BlockedWebsiteRepository,
+class WebsitesService(
+    private val websiteRepository: WebsiteRepository,
     private val coroutineScope: CoroutineScope
 ) {
 
@@ -15,7 +15,7 @@ class BlockingWebsitesService(
         onBlockedWebsite: () -> Unit
     ) {
         coroutineScope.launch {
-            blockedWebsiteRepository.blockedWebsites.collect { blockedWebsites ->
+            websiteRepository.websites.collect { blockedWebsites ->
                 if (blockedWebsites.isEmpty()) {
                     Log.d(ARJUNA_TAG, "Blocked websites is empty. Not blocking $urlChanged")
                     return@collect
@@ -28,7 +28,7 @@ class BlockingWebsitesService(
         }
     }
 
-    private fun Collection<BlockedWebsite>.blocks(url: String) =
+    private fun Collection<Website>.blocks(url: String) =
         this.any { url.contains(it.mainDomain, ignoreCase = true) }
 
     data class UrlChanged(val url: String)
