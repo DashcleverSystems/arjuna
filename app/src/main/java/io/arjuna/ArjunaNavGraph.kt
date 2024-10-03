@@ -10,8 +10,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.arjuna.blockedwebsites.BlockedWebsite
-import io.arjuna.blockedwebsites.BlockedWebsitesViewModel
+import io.arjuna.websites.Website
+import io.arjuna.websites.WebsitesViewModel
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.view.ScheduleDetails
@@ -21,7 +21,7 @@ import java.util.UUID
 
 @Composable
 fun ArjunaNavGraph(
-    blockedWebsitesViewModel: BlockedWebsitesViewModel,
+    websitesViewModel: WebsitesViewModel,
     schedulesViewModel: SchedulesViewModel,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
@@ -36,17 +36,17 @@ fun ArjunaNavGraph(
         modifier = modifier,
     ) {
         composable(ArjunaDestinations.HOME) {
-            val blockedWebsites by blockedWebsitesViewModel.blockedWebsites
+            val websites by websitesViewModel.websites
                 .collectAsState(initial = emptySet())
             val schedules by schedulesViewModel.schedules.collectAsState(initial = emptySet())
-            HomeComposable(blockedWebsites,
-                onWebsiteRemove = { websiteToRemove: BlockedWebsite ->
-                    blockedWebsitesViewModel.removeWebsiteToBlock(websiteToRemove)
+            HomeComposable(websites,
+                onWebsiteRemove = { websiteToRemove: Website ->
+                    websitesViewModel.removeWebsiteToBlock(websiteToRemove)
                 },
                 onWebsiteAdd = { websiteToBlock: String? ->
                     if (websiteToBlock != null) {
-                        blockedWebsitesViewModel.addWebsiteToBlock(
-                            BlockedWebsite(mainDomain = websiteToBlock)
+                        websitesViewModel.addWebsiteToBlock(
+                            Website(mainDomain = websiteToBlock)
                         )
                     }
                 },

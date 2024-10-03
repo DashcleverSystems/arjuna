@@ -9,13 +9,13 @@ message UUID {
   string value = 1;
 }
 
-message BlockedWebsite {
+message Website {
   string domain = 1;
   UUID identifier = 2;
 }
 
-message BlockedWebsites {
-  repeated BlockedWebsite websites = 1;
+message Websites {
+  repeated Website websites = 1;
 }
 
 enum Weekday {

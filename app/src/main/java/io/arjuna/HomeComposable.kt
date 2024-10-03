@@ -16,14 +16,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import io.arjuna.blockedwebsites.AddDialogComposable
-import io.arjuna.blockedwebsites.BlockedWebsite
-import io.arjuna.blockedwebsites.BlockedWebsites
+import io.arjuna.websites.AddDialog
+import io.arjuna.websites.Website
+import io.arjuna.websites.Websites
 
 @Composable
 fun HomeComposable(
-    blockedWebsites: Set<BlockedWebsite>,
-    onWebsiteRemove: (BlockedWebsite) -> Unit,
+    websites: Set<Website>,
+    onWebsiteRemove: (Website) -> Unit,
     onWebsiteAdd: (String?) -> Unit,
     schedulesOverviewProvider: @Composable () -> Unit
 ) {
@@ -33,9 +33,9 @@ fun HomeComposable(
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        BlockedWebsites(blockedWebsites, { onWebsiteRemove(it) }) {
+        Websites(websites, { onWebsiteRemove(it) }) {
             var showAddDialog by remember { mutableStateOf(false) }
-            AddDialogComposable(showAddDialog) { showAddDialog = false; onWebsiteAdd(it) }
+            AddDialog(showAddDialog) { showAddDialog = false; onWebsiteAdd(it) }
 
             SmallFloatingActionButton(
                 shape = RoundedCornerShape(100),

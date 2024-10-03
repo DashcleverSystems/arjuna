@@ -1,4 +1,4 @@
-package io.arjuna.blockedwebsites
+package io.arjuna.websites
 
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.CoroutineScope
@@ -6,50 +6,50 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.util.UUID
-import io.arjuna.proto.BlockedWebsite as BlockedWebsiteProto
-import io.arjuna.proto.BlockedWebsites as BlockedWebsitesProto
+import io.arjuna.proto.Website as WebsiteProto
+import io.arjuna.proto.Websites as WebsitesProto
 
-data class BlockedWebsite(
+data class Website(
     val identifier: Id = Id(),
     val mainDomain: String
 ) {
     data class Id(val uuid: UUID = UUID.randomUUID())
 }
 
-class BlockedWebsiteRepository(
+class WebsiteRepository(
     private val coroutineScope: CoroutineScope,
-    private val dataStore: DataStore<BlockedWebsitesProto>
+    private val dataStore: DataStore<WebsitesProto>
 ) {
-    val blockedWebsites: Flow<Set<BlockedWebsite>> =
+    val websites: Flow<Set<Website>> =
         dataStore.data.map { blockedWebsites ->
             blockedWebsites.websitesList.map {
-                BlockedWebsite(
-                    BlockedWebsite.Id(it.identifier.toUUID()),
+                Website(
+                    Website.Id(it.identifier.toUUID()),
                     it.domain
                 )
             }
                 .toSet()
         }
 
-    fun addWebsiteToBlock(website: BlockedWebsite) {
+    fun addWebsiteToBlock(website: Website) {
         coroutineScope.launch {
-            dataStore.updateData { currentData: BlockedWebsitesProto ->
+            dataStore.updateData { currentData: WebsitesProto ->
                 if (currentData.contains(website)) return@updateData currentData
-                val newDataBuilder = BlockedWebsitesProto.newBuilder()
+                val newDataBuilder = WebsitesProto.newBuilder()
                 newDataBuilder.addAllWebsites(currentData.websitesList + website.toProto())
                 return@updateData newDataBuilder.build()
             }
         }
     }
 
-    fun removeWebsiteToBlock(website: BlockedWebsite) {
+    fun removeWebsiteToBlock(website: Website) {
         coroutineScope.launch {
-            dataStore.updateData { currentData: BlockedWebsitesProto ->
+            dataStore.updateData { currentData: WebsitesProto ->
                 val websiteToRemove =
-                    currentData.websitesList.firstOrNull { it: BlockedWebsiteProto ->
+                    currentData.websitesList.firstOrNull { it: WebsiteProto ->
                         it.identifier.toUUID() == website.identifier.uuid
                     } ?: return@updateData currentData
-                val newDataBuilder = BlockedWebsitesProto.newBuilder()
+                val newDataBuilder = WebsitesProto.newBuilder()
                 newDataBuilder.addAllWebsites(currentData.websitesList - websiteToRemove)
                 return@updateData newDataBuilder.build()
             }

@@ -1,8 +1,8 @@
 package io.arjuna.schedule.application
 
 import androidx.lifecycle.ViewModel
-import io.arjuna.blockedwebsites.BlockedWebsite
-import io.arjuna.blockedwebsites.BlockedWebsiteRepository
+import io.arjuna.websites.Website
+import io.arjuna.websites.WebsiteRepository
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import kotlinx.coroutines.flow.Flow
@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.map
 
 class SchedulesViewModel(
     private val scheduleRepository: ScheduleRepository,
-    websiteRepository: BlockedWebsiteRepository
+    websiteRepository: WebsiteRepository
 ) : ViewModel() {
 
     fun save(schedule: Schedule) = scheduleRepository.save(schedule)
@@ -22,5 +22,5 @@ class SchedulesViewModel(
     fun findScheduleById(scheduleId: Schedule.Id): Flow<Schedule?> =
         scheduleRepository.findAll().map { schedules -> schedules.find { it.identifier == scheduleId } }
 
-    val websites: Flow<Set<BlockedWebsite>> = websiteRepository.blockedWebsites
+    val websites: Flow<Set<Website>> = websiteRepository.websites
 }

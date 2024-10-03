@@ -31,7 +31,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import io.arjuna.blockedwebsites.BlockedWebsite
+import io.arjuna.websites.Website
 import io.arjuna.composables.MainElevatedCardModifier
 import io.arjuna.composables.OutlinedCard
 import io.arjuna.composables.OutlinedCards
@@ -191,7 +191,7 @@ fun ScheduleDetails(
 }
 
 @Composable
-private fun WebsiteName(website: BlockedWebsite, isSelected: Boolean, modifier: Modifier) {
+private fun WebsiteName(website: Website, isSelected: Boolean, modifier: Modifier) {
     val colors = if (isSelected)
         CardDefaults.outlinedCardColors()
             .copy(containerColor = MaterialTheme.colorScheme.secondary)
@@ -228,9 +228,9 @@ private val Weekday.abbreviation: String
     }
 
 class ScheduleDetailsState(
-    val websites: Set<BlockedWebsite> = emptySet(),
+    val websites: Set<Website> = emptySet(),
     initialName: String = "Schedule lock",
-    initialSelectedWebsites: Set<BlockedWebsite.Id> = emptySet(),
+    initialSelectedWebsites: Set<Website.Id> = emptySet(),
     initialFrom: Time = Hour(7) with Minute(0),
     initialTo: Time = Hour(17) with Minute(0),
     initialSelectedDays: Set<Weekday> = emptySet()

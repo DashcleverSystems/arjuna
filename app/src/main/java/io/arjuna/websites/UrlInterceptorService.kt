@@ -1,4 +1,4 @@
-package io.arjuna.blockedwebsites
+package io.arjuna.websites
 
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import io.arjuna.MainActivity
-import io.arjuna.blockedwebsites.BlockingWebsitesService.UrlChanged
+import io.arjuna.websites.WebsitesService.UrlChanged
 import io.arjuna.logging.ARJUNA_TAG
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,12 +15,12 @@ import kotlinx.coroutines.SupervisorJob
 
 class UrlInterceptorService : AccessibilityService() {
 
-    private val blockingWebsitesService by lazy {
-        val repository = BlockedWebsiteRepository(
+    private val websitesService by lazy {
+        val repository = WebsiteRepository(
             CoroutineScope(Dispatchers.Main + SupervisorJob()),
             baseContext.blockedWebsitesStore
         )
-        BlockingWebsitesService(
+        WebsitesService(
             repository,
             CoroutineScope(Dispatchers.Main + SupervisorJob())
         )
@@ -51,7 +51,7 @@ class UrlInterceptorService : AccessibilityService() {
             ?: return
         Log.d(ARJUNA_TAG, "Captured url: $capturedUrl")
 
-        blockingWebsitesService.onUrlChange(UrlChanged(capturedUrl)) {
+        websitesService.onUrlChange(UrlChanged(capturedUrl)) {
             val intent = Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
