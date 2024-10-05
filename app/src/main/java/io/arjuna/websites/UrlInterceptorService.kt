@@ -7,8 +7,10 @@ import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import io.arjuna.MainActivity
-import io.arjuna.websites.WebsitesService.UrlChanged
 import io.arjuna.logging.ARJUNA_TAG
+import io.arjuna.schedule.infra.proto.ScheduleRepository
+import io.arjuna.schedule.infra.proto.schedulesStore
+import io.arjuna.websites.WebsitesService.UrlChanged
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -16,9 +18,9 @@ import kotlinx.coroutines.SupervisorJob
 class UrlInterceptorService : AccessibilityService() {
 
     private val websitesService by lazy {
-        val repository = WebsiteRepository(
+        val repository = ScheduleRepository(
             CoroutineScope(Dispatchers.Main + SupervisorJob()),
-            baseContext.blockedWebsitesStore
+            baseContext.schedulesStore
         )
         WebsitesService(
             repository,
