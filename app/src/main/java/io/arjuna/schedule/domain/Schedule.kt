@@ -7,7 +7,7 @@ import java.util.UUID
 class Schedule(
     var name: String = "Schedule lock",
     val identifier: Id = Id(),
-    var websites: Set<Website.Id>,
+    var websites: Set<Website>,
     var onDays: Set<Weekday>,
     var from: Time,
     var to: Time
