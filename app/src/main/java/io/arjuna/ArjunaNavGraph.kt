@@ -70,7 +70,7 @@ fun ArjunaNavGraph(
                 schedule?.let {
                     val state =
                         ScheduleDetailsState(
-                            websites,
+                            it.websites + websites,
                             it.name,
                             it.websites,
                             it.from,

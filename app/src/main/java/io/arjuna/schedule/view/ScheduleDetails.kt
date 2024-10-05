@@ -69,7 +69,7 @@ fun ScheduleDetails(
                 OutlinedCards(
                     elements = state.websites,
                     elementComposable = { website ->
-                        val isLocked = state.selectedWebsites.any { it == website.identifier }
+                        val isLocked = state.selectedWebsites.any { it == website }
                         WebsiteName(
                             website,
                             isLocked,
@@ -77,8 +77,8 @@ fun ScheduleDetails(
                                 .align(Alignment.CenterHorizontally)
                                 .clickable(
                                     onClick = {
-                                        if (isLocked) state.selectedWebsites -= website.identifier
-                                        else state.selectedWebsites += website.identifier
+                                        if (isLocked) state.selectedWebsites -= website
+                                        else state.selectedWebsites += website
                                     }
                                 )
                         )
@@ -230,7 +230,7 @@ private val Weekday.abbreviation: String
 class ScheduleDetailsState(
     val websites: Set<Website> = emptySet(),
     initialName: String = "Schedule lock",
-    initialSelectedWebsites: Set<Website.Id> = emptySet(),
+    initialSelectedWebsites: Set<Website> = emptySet(),
     initialFrom: Time = Hour(7) with Minute(0),
     initialTo: Time = Hour(17) with Minute(0),
     initialSelectedDays: Set<Weekday> = emptySet()

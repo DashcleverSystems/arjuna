@@ -31,7 +31,7 @@ enum Weekday {
 message Schedule {
   UUID identifier = 1;
   string name = 2;
-  repeated UUID websiteIdentifiers = 3;
+  repeated Website websites = 3;
   repeated Weekday onDays = 4;
   int32 fromHour = 5;
   int32 fromMinute = 6;
