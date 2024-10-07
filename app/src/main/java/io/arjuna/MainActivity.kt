@@ -49,6 +49,12 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val isWarningScreen = intent.getBooleanExtra("warn", false)
+        val blockedUrl = intent.getStringExtra("url") ?: ""
+        val warningDestination = ArjunaDestinations.WARN.replace(
+            "{${DestinationArgs.WEBSITE_DOMAIN}}",
+            blockedUrl.substringBefore("/")
+        )
 
         setContent {
             ArjunaTheme {
@@ -57,7 +63,8 @@ class MainActivity : ComponentActivity() {
                     ArjunaNavGraph(
                         websitesViewModel,
                         schedulesViewModel,
-                        Modifier.padding(innerPadding)
+                        Modifier.padding(innerPadding),
+                        startDestination = if (isWarningScreen) warningDestination else ArjunaDestinations.HOME
                     )
                 }
             }

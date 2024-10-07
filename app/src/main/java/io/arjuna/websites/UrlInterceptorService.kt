@@ -56,6 +56,8 @@ class UrlInterceptorService : AccessibilityService() {
         websitesService.onUrlChange(UrlChanged(capturedUrl)) {
             val intent = Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra("warn", true)
+                putExtra("url", capturedUrl)
             }
             startActivity(intent)
         }

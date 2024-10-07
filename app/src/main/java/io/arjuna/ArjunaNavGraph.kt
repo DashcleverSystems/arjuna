@@ -1,22 +1,30 @@
 package io.arjuna
 
 import android.os.Bundle
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import io.arjuna.websites.Website
-import io.arjuna.websites.WebsitesViewModel
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.view.ScheduleDetails
 import io.arjuna.schedule.view.ScheduleDetailsState
 import io.arjuna.schedule.view.SchedulesOverview
+import io.arjuna.websites.Website
+import io.arjuna.websites.WebsitesViewModel
 import java.util.UUID
 
 @Composable
@@ -90,6 +98,29 @@ fun ArjunaNavGraph(
                 }
             }
         }
+        composable(ArjunaDestinations.WARN) { backStackEntry ->
+            val websiteDomainName = backStackEntry.arguments
+                ?.getString(DestinationArgs.WEBSITE_DOMAIN)
+                ?: ""
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .padding(10.dp),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Column(Modifier.align(Alignment.Center)) {
+                    Text(
+                        "Website you've tried to visit was blocked by you!",
+                        Modifier.align(Alignment.CenterHorizontally)
+                    )
+                    Text(
+                        websiteDomainName,
+                        Modifier.align(Alignment.CenterHorizontally),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+        }
     }
 }
 
@@ -97,16 +128,19 @@ object ArjunaDestinations {
     const val HOME = "/${Screens.HOME}"
     const val SCHEDULE_DETAILS =
         "/${Screens.SCHEDULES}/{${DestinationArgs.SCHEDULE_ID}}"
+    const val WARN = "/${Screens.WARN}/{${DestinationArgs.WEBSITE_DOMAIN}}"
 
 }
 
 object DestinationArgs {
     const val SCHEDULE_ID = "SCHEDULE_ID"
+    const val WEBSITE_DOMAIN = "WEBSITE_DOMAIN"
 }
 
 object Screens {
     const val HOME = "home"
     const val SCHEDULES = "schedules"
+    const val WARN = "warn"
 }
 
 class NavActions(private val navController: NavController) {
@@ -126,6 +160,15 @@ class NavActions(private val navController: NavController) {
 
     fun navigateToHome() {
         navController.navigate(ArjunaDestinations.HOME)
+    }
+
+    fun navigateToWarn(websiteDomain: String) {
+        navController.navigate(
+            ArjunaDestinations.WARN.replace(
+                "{${DestinationArgs.WEBSITE_DOMAIN}}",
+                websiteDomain
+            )
+        )
     }
 }
 
