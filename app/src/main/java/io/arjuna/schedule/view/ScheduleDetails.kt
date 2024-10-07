@@ -27,11 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import io.arjuna.websites.Website
 import io.arjuna.composables.MainElevatedCardModifier
 import io.arjuna.composables.OutlinedCard
 import io.arjuna.composables.OutlinedCards
@@ -41,6 +39,7 @@ import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.domain.Time
 import io.arjuna.schedule.domain.Weekday
 import io.arjuna.schedule.domain.with
+import io.arjuna.websites.Website
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -116,10 +115,6 @@ fun ScheduleDetails(
                     Modifier
                         .padding(4.dp)
                         .align(Alignment.CenterHorizontally)
-                        .onFocusChanged {
-                            state.from =
-                                fromTimePickerState.hour.Hour() with fromTimePickerState.minute.Minute()
-                        }
                 )
                 HorizontalDivider(
                     Modifier
@@ -136,10 +131,6 @@ fun ScheduleDetails(
                     Modifier
                         .padding(4.dp)
                         .align(Alignment.CenterHorizontally)
-                        .onFocusChanged {
-                            state.to =
-                                toTimePickerState.hour.Hour() with toTimePickerState.minute.Minute()
-                        }
                 )
                 HorizontalDivider(
                     Modifier
@@ -183,7 +174,13 @@ fun ScheduleDetails(
                 .fillMaxWidth(0.9f)
                 .padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                 .align(Alignment.CenterHorizontally),
-            onClick = onClose
+            onClick = {
+                state.from =
+                    fromTimePickerState.hour.Hour() with fromTimePickerState.minute.Minute()
+                state.to =
+                    toTimePickerState.hour.Hour() with toTimePickerState.minute.Minute()
+                onClose.invoke()
+            }
         ) {
             Icon(Icons.Sharp.Done, "Adds website to block")
         }
