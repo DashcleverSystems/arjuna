@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Add
@@ -41,7 +40,13 @@ fun SchedulesOverview(
                     ScheduleNameText("Nothing to protect from yet!")
                 }
             },
-            elementComposable = { ScheduleDetails(it, onScheduleClick) }
+            elementComposable = {
+                ScheduleDetails(
+                    Modifier.align(Alignment.CenterHorizontally),
+                    it,
+                    onScheduleClick
+                )
+            }
         )
         SmallFloatingActionButton(
             shape = RoundedCornerShape(100),
@@ -56,12 +61,14 @@ fun SchedulesOverview(
 }
 
 @Composable
-private fun ScheduleDetails(schedule: Schedule, onClick: (Schedule) -> Unit) {
-    OutlinedCard(Modifier.clickable { onClick.invoke(schedule) }) {
+private fun ScheduleDetails(modifier: Modifier, schedule: Schedule, onClick: (Schedule) -> Unit) {
+    OutlinedCard(modifier.clickable { onClick.invoke(schedule) }) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
         ) {
             ScheduleNameText(schedule.name)
         }
