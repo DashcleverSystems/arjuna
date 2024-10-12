@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
-import io.arjuna.composables.MainElevatedCardModifier
+import io.arjuna.composables.CommonElevatedCardModifier
 import io.arjuna.composables.OutlinedCard
 import io.arjuna.composables.OutlinedCards
 import io.arjuna.schedule.domain.Hour
@@ -54,11 +54,11 @@ fun ScheduleDetails(
         TextField(
             state.name,
             { state.name = it },
-            MainElevatedCardModifier,
+            CommonElevatedCardModifier,
             label = { Text("Schedule name") }
         )
 
-        ElevatedCard(MainElevatedCardModifier) {
+        ElevatedCard(CommonElevatedCardModifier) {
             Column(
                 Modifier
                     .fillMaxWidth()
@@ -97,7 +97,7 @@ fun ScheduleDetails(
                 initialMinute = state.to.minute.value,
                 is24Hour = true
             )
-        ElevatedCard(MainElevatedCardModifier) {
+        ElevatedCard(CommonElevatedCardModifier) {
             Column(Modifier.fillMaxWidth()) {
                 Text("Lock time", Modifier.padding(6.dp), fontWeight = FontWeight.Bold)
                 HorizontalDivider(

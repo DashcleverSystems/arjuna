@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Clear
 import androidx.compose.material3.ElevatedCard
@@ -17,26 +16,38 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import io.arjuna.composables.MainElevatedCardModifier
+import io.arjuna.composables.CommonElevatedCardModifier
 import io.arjuna.composables.OutlinedCard
 import io.arjuna.composables.OutlinedCards
 
 @Composable
 fun Websites(
+    modifier: Modifier = CommonElevatedCardModifier,
     websites: Set<Website>,
     onWebsiteRemove: (Website) -> Unit = {},
-    addButtonProvider: @Composable () -> Unit = {}
+    addButtonProvider: @Composable () -> Unit = {},
 ) {
-    ElevatedCard(MainElevatedCardModifier.wrapContentWidth(Alignment.CenterHorizontally)) {
-        Text("Websites", Modifier.padding(4.dp), fontWeight = FontWeight.Bold)
+    ElevatedCard(modifier) {
+        Text(
+            "Websites",
+            Modifier
+                .padding(4.dp),
+            fontWeight = FontWeight.Bold
+        )
         OutlinedCards(
             websites,
             onEmptyContent = {
-                OutlinedCard {
+                OutlinedCard(Modifier.align(Alignment.CenterHorizontally)) {
                     WebsiteText("Nothing to protect from yet!")
                 }
             },
-            elementComposable = { Website(it, onWebsiteRemove) },
+            elementComposable = {
+                Website(
+                    Modifier.align(Alignment.CenterHorizontally),
+                    it,
+                    onWebsiteRemove
+                )
+            },
             additionalContent = addButtonProvider
         )
     }
@@ -44,14 +55,16 @@ fun Websites(
 
 @Composable
 private fun Website(
+    modifier: Modifier,
     website: Website,
     onRemove: (Website) -> Unit
 ) {
-    OutlinedCard {
+    OutlinedCard(modifier) {
         Row(
+            modifier = Modifier
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.fillMaxWidth()
         ) {
             WebsiteText(website.mainDomain)
             RemoveButton { onRemove.invoke(website) }

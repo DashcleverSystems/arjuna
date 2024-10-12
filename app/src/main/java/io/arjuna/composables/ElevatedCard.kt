@@ -5,6 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-val MainElevatedCardModifier = Modifier
+val CommonElevatedCardModifier = Modifier
     .padding(4.dp)
     .fillMaxWidth(0.9f)
