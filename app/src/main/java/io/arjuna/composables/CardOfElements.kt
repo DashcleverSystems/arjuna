@@ -29,7 +29,7 @@ fun OutlinedCard(
 ) {
     androidx.compose.material3.OutlinedCard(
         modifier
-            .padding(10.dp)
+            .padding(1.dp)
             .fillMaxWidth(0.7f),
         colors = colors
     ) {

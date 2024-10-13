@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,6 +30,7 @@ import java.util.UUID
 
 @Composable
 fun ArjunaNavGraph(
+    isAppAllowedToBlock: Boolean,
     websitesViewModel: WebsitesViewModel,
     schedulesViewModel: SchedulesViewModel,
     modifier: Modifier = Modifier,
@@ -47,7 +49,11 @@ fun ArjunaNavGraph(
             val websites by websitesViewModel.websites
                 .collectAsState(initial = emptySet())
             val schedules by schedulesViewModel.schedules.collectAsState(initial = emptySet())
-            HomeComposable(websites,
+            val homeElementsModifier = Modifier.fillMaxWidth(0.8f).padding(5.dp)
+            HomeComposable(
+                homeElementsModifier,
+                isAppAllowedToBlock,
+                websites,
                 onWebsiteRemove = { websiteToRemove: Website ->
                     websitesViewModel.removeWebsiteToBlock(websiteToRemove)
                 },
@@ -58,8 +64,9 @@ fun ArjunaNavGraph(
                         )
                     }
                 },
-                schedulesOverviewProvider = {
+                schedulesOverviewProvider = { modifier ->
                     SchedulesOverview(
+                        modifier,
                         schedules,
                         onScheduleClick = { navActions.navigateToScheduleDetails(it.identifier) },
                         onAddButtonClick = { navActions.navigateToScheduleCreation() }
