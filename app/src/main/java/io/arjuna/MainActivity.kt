@@ -1,9 +1,6 @@
 package io.arjuna
 
-import android.content.ComponentName
 import android.os.Bundle
-import android.provider.Settings
-import android.text.TextUtils
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -14,12 +11,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import io.arjuna.appcheck.AppStatusService
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
 import io.arjuna.ui.theme.ArjunaTheme
 import io.arjuna.viewmodel.SimpleViewModelFactory
-import io.arjuna.websites.UrlInterceptorService
 import io.arjuna.websites.WebsiteRepository
 import io.arjuna.websites.WebsitesViewModel
 import io.arjuna.websites.blockedWebsitesStore
@@ -27,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
-private val DEFAULT_COROUTINE_SCOPE = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+val DEFAULT_COROUTINE_SCOPE = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 class MainActivity : ComponentActivity() {
 
@@ -57,6 +54,8 @@ class MainActivity : ComponentActivity() {
         }
     })
 
+    private val appStatusService = AppStatusService { UrlInterceptorService::class.java }
+
     private var canBlockWebsites by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,29 +84,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
+        this.canBlockWebsites = appStatusService.isAllowedToBlockWebsites(this.application)
         super.onResume()
-        this.canBlockWebsites = isAccessibilityServiceEnabled()
     }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val context = this.application
-        val expectedComponentName = ComponentName(context, UrlInterceptorService::class.java)
-        val enabledServices = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        ) ?: return false
-
-        val colonSplitter = TextUtils.SimpleStringSplitter(':')
-        colonSplitter.setString(enabledServices)
-
-        while (colonSplitter.hasNext()) {
-            val componentName = colonSplitter.next()
-            if (ComponentName.unflattenFromString(componentName) == expectedComponentName) {
-                return true
-            }
-        }
-
-        return false
-    }
 }
 

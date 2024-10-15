@@ -31,8 +31,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import io.arjuna.composables.CommonElevatedCardModifier
+import io.arjuna.composables.ElevatedCardTitle
 import io.arjuna.composables.OutlinedCard
-import io.arjuna.composables.OutlinedCards
 import io.arjuna.schedule.domain.Hour
 import io.arjuna.schedule.domain.Minute
 import io.arjuna.schedule.domain.Schedule
@@ -64,25 +64,22 @@ fun ScheduleDetails(
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
             ) {
-                Text("Websites", Modifier.padding(6.dp), fontWeight = FontWeight.Bold)
-                OutlinedCards(
-                    elements = state.websites,
-                    elementComposable = { website ->
-                        val isLocked = state.selectedWebsites.any { it == website }
-                        WebsiteName(
-                            website,
-                            isLocked,
-                            Modifier
-                                .align(Alignment.CenterHorizontally)
-                                .clickable(
-                                    onClick = {
-                                        if (isLocked) state.selectedWebsites -= website
-                                        else state.selectedWebsites += website
-                                    }
-                                )
-                        )
-                    }
-                )
+                ElevatedCardTitle("Websites")
+                state.websites.forEach { website ->
+                    val isLocked = state.selectedWebsites.any { it == website }
+                    WebsiteName(
+                        website,
+                        isLocked,
+                        Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .clickable(
+                                onClick = {
+                                    if (isLocked) state.selectedWebsites -= website
+                                    else state.selectedWebsites += website
+                                }
+                            )
+                    )
+                }
             }
         }
         val fromTimePickerState =
@@ -251,4 +248,17 @@ class ScheduleDetailsState(
         to = this.to,
         onDays = this.selectedDays
     )
+
+    companion object {
+
+        fun Schedule.toState(websites: Set<Website>): ScheduleDetailsState =
+            ScheduleDetailsState(
+                this.websites + websites,
+                this.name,
+                this.websites,
+                this.from,
+                this.to,
+                this.onDays
+            )
+    }
 }

@@ -10,15 +10,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun <T> OutlinedCards(
+fun <T> OptionalContent(
     elements: Set<T>,
-    onEmptyContent: @Composable (() -> Unit)? = null,
+    onEmptyContent: @Composable (() -> Unit)?,
     elementComposable: @Composable (T) -> Unit,
-    additionalContent: @Composable () -> Unit = {}
 ) {
     onEmptyContent?.let { if (elements.isEmpty()) it.invoke() }
     elements.forEach { elementComposable(it) }
-    additionalContent.invoke()
 }
 
 @Composable
