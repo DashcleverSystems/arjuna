@@ -25,6 +25,9 @@ import io.arjuna.websites.WebsitesViewModel
 import io.arjuna.websites.blockedWebsitesStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+
+private val DEFAULT_COROUTINE_SCOPE = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 class MainActivity : ComponentActivity() {
 
@@ -32,7 +35,7 @@ class MainActivity : ComponentActivity() {
     viewModels<WebsitesViewModel>(factoryProducer = {
         SimpleViewModelFactory {
             val repository = WebsiteRepository(
-                CoroutineScope(Dispatchers.Main),
+                DEFAULT_COROUTINE_SCOPE,
                 application.blockedWebsitesStore
             )
             WebsitesViewModel(repository)
@@ -43,11 +46,11 @@ class MainActivity : ComponentActivity() {
     viewModels<SchedulesViewModel>(factoryProducer = {
         SimpleViewModelFactory {
             val scheduleRepository = ScheduleRepository(
-                CoroutineScope(Dispatchers.Main),
+                DEFAULT_COROUTINE_SCOPE,
                 application.schedulesStore
             )
             val websiteRepository = WebsiteRepository(
-                CoroutineScope(Dispatchers.Main),
+                DEFAULT_COROUTINE_SCOPE,
                 application.blockedWebsitesStore
             )
             SchedulesViewModel(scheduleRepository, websiteRepository)
