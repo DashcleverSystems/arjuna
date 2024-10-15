@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,8 +22,7 @@ import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.view.ScheduleDetails
 import io.arjuna.schedule.view.ScheduleDetailsState
-import io.arjuna.schedule.view.SchedulesOverview
-import io.arjuna.websites.Website
+import io.arjuna.schedule.view.ScheduleDetailsState.Companion.toState
 import io.arjuna.websites.WebsitesViewModel
 import java.util.UUID
 
@@ -46,32 +44,15 @@ fun ArjunaNavGraph(
         modifier = modifier,
     ) {
         composable(ArjunaDestinations.HOME) {
-            val websites by websitesViewModel.websites
-                .collectAsState(initial = emptySet())
+            val websites by websitesViewModel.websites.collectAsState(initial = emptySet())
             val schedules by schedulesViewModel.schedules.collectAsState(initial = emptySet())
-            val homeElementsModifier = Modifier.fillMaxWidth(0.8f).padding(5.dp)
             HomeComposable(
-                homeElementsModifier,
                 isAppAllowedToBlock,
                 websites,
-                onWebsiteRemove = { websiteToRemove: Website ->
-                    websitesViewModel.removeWebsiteToBlock(websiteToRemove)
-                },
-                onWebsiteAdd = { websiteToBlock: String? ->
-                    if (websiteToBlock != null) {
-                        websitesViewModel.addWebsiteToBlock(
-                            Website(mainDomain = websiteToBlock)
-                        )
-                    }
-                },
-                schedulesOverviewProvider = { modifier ->
-                    SchedulesOverview(
-                        modifier,
-                        schedules,
-                        onScheduleClick = { navActions.navigateToScheduleDetails(it.identifier) },
-                        onAddButtonClick = { navActions.navigateToScheduleCreation() }
-                    )
-                }
+                onWebsiteRemove = { websitesViewModel.removeWebsiteToBlock(it) },
+                onWebsiteAdd = { websitesViewModel.addWebsiteToBlock(it) },
+                schedules = schedules,
+                navActions = navActions
             )
         }
         composable(ArjunaDestinations.SCHEDULE_DETAILS) { backStackEntry ->
@@ -83,15 +64,7 @@ fun ArjunaNavGraph(
                 val schedule: Schedule? by schedulesViewModel.findScheduleById(scheduleId)
                     .collectAsState(initial = null)
                 schedule?.let {
-                    val state =
-                        ScheduleDetailsState(
-                            it.websites + websites,
-                            it.name,
-                            it.websites,
-                            it.from,
-                            it.to,
-                            it.onDays
-                        )
+                    val state = it.toState(websites)
                     ScheduleDetails(state) {
                         schedulesViewModel.save(state.writeTo(schedule))
                         navActions.navigateToHome()

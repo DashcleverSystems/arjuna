@@ -18,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import io.arjuna.composables.OutlinedCard
-import io.arjuna.composables.OutlinedCards
+import io.arjuna.composables.OptionalContent
 import io.arjuna.schedule.domain.Schedule
 
 @Composable
@@ -34,7 +34,7 @@ fun SchedulesOverview(
             Modifier.padding(4.dp),
             fontWeight = FontWeight.Bold
         )
-        OutlinedCards(schedules,
+        OptionalContent(schedules,
             onEmptyContent = {
                 OutlinedCard(Modifier.align(Alignment.CenterHorizontally)) {
                     ScheduleNameText("Nothing to protect from yet!")
