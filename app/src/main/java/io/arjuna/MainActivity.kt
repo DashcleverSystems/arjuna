@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import io.arjuna.appcheck.AppStatusService
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
@@ -57,6 +58,8 @@ class MainActivity : ComponentActivity() {
         }
     })
 
+    private val appStatusService = AppStatusService { UrlInterceptorService::class.java }
+
     private var canBlockWebsites by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -85,29 +88,9 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
+        this.canBlockWebsites = appStatusService.isAllowedToBlockWebsites(this.application)
         super.onResume()
-        this.canBlockWebsites = isAccessibilityServiceEnabled()
     }
 
-    private fun isAccessibilityServiceEnabled(): Boolean {
-        val context = this.application
-        val expectedComponentName = ComponentName(context, UrlInterceptorService::class.java)
-        val enabledServices = Settings.Secure.getString(
-            context.contentResolver,
-            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
-        ) ?: return false
-
-        val colonSplitter = TextUtils.SimpleStringSplitter(':')
-        colonSplitter.setString(enabledServices)
-
-        while (colonSplitter.hasNext()) {
-            val componentName = colonSplitter.next()
-            if (ComponentName.unflattenFromString(componentName) == expectedComponentName) {
-                return true
-            }
-        }
-
-        return false
-    }
 }
 
