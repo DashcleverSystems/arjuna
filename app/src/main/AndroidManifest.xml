@@ -33,6 +33,12 @@
                 android:name="android.accessibilityservice"
                 android:resource="@xml/accessibility_service_config" />
         </service>
+        <provider
+            android:name="io.arjuna.BlockWebsiteFileProvider"
+            android:authorities="io.arjuna"
+            android:exported="false"
+            android:grantUriPermissions="true">
+        </provider>
     </application>
 
 </manifest>

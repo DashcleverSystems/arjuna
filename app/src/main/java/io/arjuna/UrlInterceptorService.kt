@@ -3,6 +3,7 @@ package io.arjuna
 import android.accessibilityservice.AccessibilityService
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
@@ -50,13 +51,23 @@ class UrlInterceptorService : AccessibilityService() {
             ?: return
         Log.d(ARJUNA_TAG, "Captured url: $capturedUrl")
 
+        // i have just realise it doesn't make sense to open another google tab.
+        // Reasoning was to not redirect user again to warn screen once chrome is opened
+        // again by user and the recent app, facebook is opened.
         websitesService.onUrlChange(UrlChanged(capturedUrl)) {
-            val intent = Intent(this, MainActivity::class.java).apply {
+            val nextChromeTab =
+                Intent(Intent.ACTION_VIEW).apply {
+                    data = Uri.parse("https://keep.google.com")
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    setPackage(packageName)
+                }
+            val arjunaWarnScreen = Intent(this, MainActivity::class.java).apply {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 putExtra("warn", true)
                 putExtra("url", capturedUrl)
             }
-            startActivity(intent)
+            startActivity(nextChromeTab)
+            startActivity(arjunaWarnScreen)
         }
     }
 
