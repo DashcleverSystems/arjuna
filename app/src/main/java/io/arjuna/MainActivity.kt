@@ -11,6 +11,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import io.arjuna.appcheck.AppStatusService
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
@@ -68,13 +70,18 @@ class MainActivity : ComponentActivity() {
         )
 
         setContent {
+            val navController: NavHostController = rememberNavController()
+            val navActions = NavActions(navController)
             ArjunaTheme {
-                Scaffold(modifier = Modifier.fillMaxSize(), topBar = { TopBarComposable() }
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = { TopBarComposable(navActions) },
                 ) { innerPadding ->
                     ArjunaNavGraph(
                         this.canBlockWebsites,
                         this.websitesViewModel,
                         this.schedulesViewModel,
+                        navController,
                         Modifier.padding(innerPadding),
                         startDestination = if (isWarningScreen) warningDestination else ArjunaDestinations.HOME
                     )

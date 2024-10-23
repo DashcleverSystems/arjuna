@@ -17,7 +17,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.view.ScheduleDetails
@@ -31,8 +30,8 @@ fun ArjunaNavGraph(
     isAppAllowedToBlock: Boolean,
     websitesViewModel: WebsitesViewModel,
     schedulesViewModel: SchedulesViewModel,
+    navController: NavHostController,
     modifier: Modifier = Modifier,
-    navController: NavHostController = rememberNavController(),
     startDestination: String = ArjunaDestinations.HOME,
 ) {
 
