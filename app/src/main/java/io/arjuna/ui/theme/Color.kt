@@ -2,14 +2,14 @@ package io.arjuna.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-val Green300 = Color(0xFFd5efdc)
-val Red700 = Color(0xFFD32F2F)
+val BlueGrey80 = Color(0xFFB0BEC5)
+val Teal80 = Color(0xFF80CBC4)
+val Amber80 = Color(0xFFFFD54F)
+val Lime300 = Color(0xFFDCE775)
+val DeepOrange700 = Color(0xFFD84315)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
-val Green900 = Color(0xFF1B5E20)
-val Red900 = Color(0xFFB71C1C)
+val BlueGrey40 = Color(0xFF37474F)
+val Teal40 = Color(0xFF004D40)
+val Amber40 = Color(0xFFFF8F00)
+val Lime900 = Color(0xFF827717)
+val DeepOrange900 = Color(0xFFBF360C)
