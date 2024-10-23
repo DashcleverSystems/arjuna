@@ -63,6 +63,7 @@ fun ScheduleDetails(
                 Modifier
                     .fillMaxWidth()
                     .align(Alignment.CenterHorizontally)
+                    .padding(4.dp)
             ) {
                 ElevatedCardTitle("Websites")
                 state.websites.forEach { website ->
