@@ -37,6 +37,7 @@ message Schedule {
   int32 fromMinute = 6;
   int32 toHour = 7;
   int32 toMinute = 8;
+  repeated string apps = 9;
 }
 
 message Schedules {

@@ -1,5 +1,6 @@
 package io.arjuna.schedule.infra.proto
 
+import io.arjuna.apps.InstalledApp
 import io.arjuna.proto.toJavaUUID
 import io.arjuna.proto.toProto
 import io.arjuna.schedule.domain.Hour
@@ -30,6 +31,7 @@ fun ScheduleProto.toDomain(): Schedule {
         identifier = Schedule.Id(this.identifier.toJavaUUID()),
         name = this.name,
         websites = this.websitesList.map { it.toDomain() }.toSet(),
+        apps = this.appsList.map { InstalledApp(it) }.toSet(),
         onDays = this.onDaysList.map { it.toDomain() }.toSet(),
         from = this.fromHour.Hour() with this.fromMinute.Minute(),
         to = this.toHour.Hour() with this.toMinute.Minute(),
@@ -45,6 +47,7 @@ fun Schedule.toProto(): ScheduleProto {
         toHour = this@toProto.to.hour.value
         toMinute = this@toProto.to.minute.value
         addAllWebsites(this@toProto.websites.map { it.toProto() })
+        addAllApps(this@toProto.apps.map { it.name })
         addAllOnDays(this@toProto.onDays.map { it.toProto() })
     }.build()
 }

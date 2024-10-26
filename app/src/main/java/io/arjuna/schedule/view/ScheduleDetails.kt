@@ -1,17 +1,23 @@
 package io.arjuna.schedule.view
 
+import android.graphics.drawable.Drawable
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.sharp.Done
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MultiChoiceSegmentedButtonRow
 import androidx.compose.material3.SegmentedButton
@@ -24,12 +30,16 @@ import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
+import io.arjuna.apps.InstalledApp
+import io.arjuna.apps.InstalledAppsChecklistState
+import io.arjuna.apps.SelectAppsDialog
 import io.arjuna.composables.CommonElevatedCardModifier
 import io.arjuna.composables.ElevatedCardTitle
 import io.arjuna.composables.OutlinedCard
@@ -45,10 +55,13 @@ import io.arjuna.websites.Website
 @Composable
 fun ScheduleDetails(
     state: ScheduleDetailsState = ScheduleDetailsState(),
+    appIconLoader: (InstalledApp) -> Drawable? = { _ -> null },
     onClose: () -> Unit = {}
 ) {
     Column(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         TextField(
@@ -83,6 +96,36 @@ fun ScheduleDetails(
                 }
             }
         }
+
+        ElevatedCard(CommonElevatedCardModifier) {
+            Column(
+                Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(4.dp)
+            ) {
+                ElevatedCardTitle("Installed apps")
+                var showAppsChecklistDialog by remember { mutableStateOf(false) }
+
+                state.selectedInstalledApps.forEach { app ->
+                    SelectedApp(app, Modifier.align(Alignment.CenterHorizontally))
+                }
+
+                val installedAppsChecklistState = InstalledAppsChecklistState(
+                    state.installedApps,
+                    state.selectedInstalledApps
+                )
+                if (showAppsChecklistDialog) {
+                    SelectAppsDialog(installedAppsChecklistState, appIconLoader) {
+                        state.selectedInstalledApps = installedAppsChecklistState.selectedApps
+                        showAppsChecklistDialog = false
+                    }
+                }
+                IconButton(onClick = { showAppsChecklistDialog = true }, Modifier.fillMaxSize()) {
+                    Icon(Icons.Rounded.Add, "Add apps")
+                }
+            }
+        }
+
         val fromTimePickerState =
             TimePickerState(
                 initialHour = state.from.hour.value,
@@ -193,21 +236,24 @@ private fun WebsiteName(website: Website, isSelected: Boolean, modifier: Modifie
     else
         CardDefaults.outlinedCardColors()
     OutlinedCard(modifier, colors) {
-        if (isSelected) {
-            Text(
-                website.mainDomain,
-                Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(0.7f),
-            )
-        } else {
-            Text(
-                website.mainDomain,
-                Modifier
-                    .padding(6.dp)
-                    .fillMaxWidth(0.7f),
-            )
-        }
+        Text(
+            website.mainDomain,
+            Modifier
+                .padding(6.dp)
+                .fillMaxWidth(0.7f),
+        )
+    }
+}
+
+@Composable
+private fun SelectedApp(installedApp: InstalledApp, modifier: Modifier) {
+    OutlinedCard(modifier) {
+        Text(
+            installedApp.name,
+            Modifier
+                .padding(6.dp)
+                .fillMaxWidth(0.7f),
+        )
     }
 }
 
@@ -226,12 +272,15 @@ class ScheduleDetailsState(
     val websites: Set<Website> = emptySet(),
     initialName: String = "Schedule lock",
     initialSelectedWebsites: Set<Website> = emptySet(),
+    val installedApps: Set<InstalledApp> = emptySet(),
+    initialSelectedApps: Set<InstalledApp> = emptySet(),
     initialFrom: Time = Hour(7) with Minute(0),
     initialTo: Time = Hour(17) with Minute(0),
     initialSelectedDays: Set<Weekday> = emptySet()
 ) {
     var name by mutableStateOf(initialName)
     var selectedWebsites by mutableStateOf(initialSelectedWebsites)
+    var selectedInstalledApps by mutableStateOf(initialSelectedApps)
     var from by mutableStateOf(initialFrom)
     var to by mutableStateOf(initialTo)
     var selectedDays by mutableStateOf(initialSelectedDays)
@@ -239,12 +288,14 @@ class ScheduleDetailsState(
     fun writeTo(schedule: Schedule? = null): Schedule = schedule?.apply {
         this.name = this@ScheduleDetailsState.name
         this.websites = this@ScheduleDetailsState.selectedWebsites
+        this.apps = this@ScheduleDetailsState.selectedInstalledApps
         this.from = this@ScheduleDetailsState.from
         this.to = this@ScheduleDetailsState.to
         this.onDays = this@ScheduleDetailsState.selectedDays
     } ?: Schedule(
         name = this.name,
         websites = this.selectedWebsites,
+        apps = this.installedApps,
         from = this.from,
         to = this.to,
         onDays = this.selectedDays
@@ -252,11 +303,16 @@ class ScheduleDetailsState(
 
     companion object {
 
-        fun Schedule.toState(websites: Set<Website>): ScheduleDetailsState =
+        fun Schedule.toState(
+            websites: Set<Website>,
+            installedApps: Set<InstalledApp>
+        ): ScheduleDetailsState =
             ScheduleDetailsState(
                 this.websites + websites,
                 this.name,
                 this.websites,
+                installedApps,
+                this.apps,
                 this.from,
                 this.to,
                 this.onDays
