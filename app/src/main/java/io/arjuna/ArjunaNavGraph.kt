@@ -66,14 +66,14 @@ fun ArjunaNavGraph(
                     .collectAsState(initial = null)
                 schedule?.let {
                     val state = it.toState(websites, installedAppsLoader.getAll())
-                    ScheduleDetails(state = state, appIconLoader = installedAppsLoader::getIcon) {
+                    ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                         schedulesViewModel.save(state.writeTo(schedule))
                         navActions.navigateToHome()
                     }
                 }
             } else {
                 val state = ScheduleDetailsState(websites)
-                ScheduleDetails(state) {
+                ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                     schedulesViewModel.save(state.writeTo())
                     navActions.navigateToHome()
                 }

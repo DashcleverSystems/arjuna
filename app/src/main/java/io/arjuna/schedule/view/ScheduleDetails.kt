@@ -55,7 +55,7 @@ import io.arjuna.websites.Website
 @Composable
 fun ScheduleDetails(
     state: ScheduleDetailsState = ScheduleDetailsState(),
-    appIconLoader: (InstalledApp) -> Drawable? = { _ -> null },
+    appIconLoader: (InstalledApp) -> Drawable?,
     onClose: () -> Unit = {}
 ) {
     Column(

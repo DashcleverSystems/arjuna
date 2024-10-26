@@ -21,11 +21,11 @@ import androidx.compose.ui.window.Dialog
 @Composable
 fun SelectAppsDialog(
     state: InstalledAppsChecklistState,
-    appIconLoader: (InstalledApp) -> Drawable? = { _ -> null },
+    appIconLoader: (InstalledApp) -> Drawable?,
     onClose: (Set<InstalledApp>) -> Unit
 ) {
     Dialog(onDismissRequest = { onClose(emptySet()) }) {
-        Card {
+        Card(Modifier.fillMaxWidth(0.8f)) {
             Text(
                 modifier = Modifier.padding(6.dp),
                 text = "Add apps to block",
@@ -40,7 +40,10 @@ fun SelectAppsDialog(
                     InstalledAppsChecklist(state, appIconLoader)
                 }
                 Row(Modifier.fillMaxWidth(0.8f)) {
-                    Button({ onClose(state.selectedApps) }, Modifier.fillMaxWidth()) {
+                    Button(
+                        { onClose(state.selectedApps) },
+                        Modifier.padding(6.dp)
+                    ) {
                         Icon(Icons.Rounded.Check, "Select apps")
                     }
                 }
