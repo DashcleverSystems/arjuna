@@ -6,13 +6,14 @@ import android.content.Intent
 import android.util.Log
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
+import io.arjuna.apps.AppBlockingService
 import io.arjuna.logging.ARJUNA_TAG
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
 import io.arjuna.websites.WebsitesService
 import io.arjuna.websites.WebsitesService.UrlChanged
 
-class UrlInterceptorService : AccessibilityService() {
+class ActivityInterceptorService : AccessibilityService() {
 
     private val websitesService by lazy {
         val repository = ScheduleRepository(
@@ -25,12 +26,19 @@ class UrlInterceptorService : AccessibilityService() {
         )
     }
 
+    private val appsBlockingService by lazy {
+        val schedulesRepo = ScheduleRepository(
+            DEFAULT_COROUTINE_SCOPE,
+            baseContext.schedulesStore
+        )
+        AppBlockingService(schedulesRepo, DEFAULT_COROUTINE_SCOPE, baseContext.packageManager)
+    }
+
     private val supportedBrowsers = InMemorySupportedBrowserProvider.supportedBrowser
 
     override fun onServiceConnected() {
         this.serviceInfo = serviceInfo.apply {
             eventTypes = AccessibilityEvent.TYPE_WINDOW_CONTENT_CHANGED
-            packageNames = supportedBrowsers.map { it.packageName }.toTypedArray()
             feedbackType = AccessibilityServiceInfo.FEEDBACK_VISUAL
             notificationTimeout = 300
             flags = AccessibilityServiceInfo.FLAG_REPORT_VIEW_IDS or
@@ -39,10 +47,20 @@ class UrlInterceptorService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
+        val packageName = event.packageName.toString()
+        appsBlockingService.onAppOpen(packageName) {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                putExtra("warn", true)
+                putExtra("url", packageName)
+            }
+            startActivity(intent)
+        }
+
         val parentNodeInfo = event.source
             ?: return
 
-        val packageName = event.packageName.toString()
+
         val browser = supportedBrowsers.firstOrNull { it.packageName == packageName }
             ?: return
 

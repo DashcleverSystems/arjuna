@@ -57,7 +57,7 @@ class MainActivity : ComponentActivity() {
         }
     })
 
-    private val appStatusService = AppStatusService { UrlInterceptorService::class.java }
+    private val appStatusService = AppStatusService { ActivityInterceptorService::class.java }
 
     private var canBlockWebsites by mutableStateOf(false)
 

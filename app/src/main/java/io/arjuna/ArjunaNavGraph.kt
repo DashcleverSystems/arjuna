@@ -91,7 +91,7 @@ fun ArjunaNavGraph(
             ) {
                 Column(Modifier.align(Alignment.Center)) {
                     Text(
-                        "Website you've tried to visit was blocked by you!",
+                        "Content you've tried to access was blocked by you!",
                         Modifier.align(Alignment.CenterHorizontally)
                     )
                     Text(
