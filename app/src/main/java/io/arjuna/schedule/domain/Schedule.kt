@@ -1,5 +1,6 @@
 package io.arjuna.schedule.domain
 
+import io.arjuna.apps.InstalledApp
 import io.arjuna.websites.Website
 import java.util.UUID
 
@@ -8,6 +9,7 @@ class Schedule(
     var name: String = "Schedule lock",
     val identifier: Id = Id(),
     var websites: Set<Website>,
+    var apps: Set<InstalledApp>,
     var onDays: Set<Weekday>,
     var from: Time,
     var to: Time

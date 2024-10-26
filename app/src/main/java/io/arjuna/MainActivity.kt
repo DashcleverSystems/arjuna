@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import io.arjuna.appcheck.AppStatusService
+import io.arjuna.apps.InstalledAppsLoader
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
@@ -56,7 +57,7 @@ class MainActivity : ComponentActivity() {
         }
     })
 
-    private val appStatusService = AppStatusService { UrlInterceptorService::class.java }
+    private val appStatusService = AppStatusService { ActivityInterceptorService::class.java }
 
     private var canBlockWebsites by mutableStateOf(false)
 
@@ -81,6 +82,7 @@ class MainActivity : ComponentActivity() {
                         this.canBlockWebsites,
                         this.websitesViewModel,
                         this.schedulesViewModel,
+                        InstalledAppsLoader(this.baseContext.packageManager),
                         navController,
                         Modifier.padding(innerPadding),
                         startDestination = if (isWarningScreen) warningDestination else ArjunaDestinations.HOME

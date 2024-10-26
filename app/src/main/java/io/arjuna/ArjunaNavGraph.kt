@@ -17,6 +17,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import io.arjuna.apps.InstalledAppsLoader
 import io.arjuna.schedule.application.SchedulesViewModel
 import io.arjuna.schedule.domain.Schedule
 import io.arjuna.schedule.view.ScheduleDetails
@@ -30,6 +31,7 @@ fun ArjunaNavGraph(
     isAppAllowedToBlock: Boolean,
     websitesViewModel: WebsitesViewModel,
     schedulesViewModel: SchedulesViewModel,
+    installedAppsLoader: InstalledAppsLoader,
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: String = ArjunaDestinations.HOME,
@@ -63,15 +65,15 @@ fun ArjunaNavGraph(
                 val schedule: Schedule? by schedulesViewModel.findScheduleById(scheduleId)
                     .collectAsState(initial = null)
                 schedule?.let {
-                    val state = it.toState(websites)
-                    ScheduleDetails(state) {
+                    val state = it.toState(websites, installedAppsLoader.getAll())
+                    ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                         schedulesViewModel.save(state.writeTo(schedule))
                         navActions.navigateToHome()
                     }
                 }
             } else {
                 val state = ScheduleDetailsState(websites)
-                ScheduleDetails(state) {
+                ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                     schedulesViewModel.save(state.writeTo())
                     navActions.navigateToHome()
                 }
@@ -89,7 +91,7 @@ fun ArjunaNavGraph(
             ) {
                 Column(Modifier.align(Alignment.Center)) {
                     Text(
-                        "Website you've tried to visit was blocked by you!",
+                        "Content you've tried to access was blocked by you!",
                         Modifier.align(Alignment.CenterHorizontally)
                     )
                     Text(
