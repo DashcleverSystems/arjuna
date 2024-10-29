@@ -72,7 +72,8 @@ fun ArjunaNavGraph(
                     }
                 }
             } else {
-                val state = ScheduleDetailsState(websites)
+                val state =
+                    ScheduleDetailsState(websites, installedApps = installedAppsLoader.getAll())
                 ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                     schedulesViewModel.save(state.writeTo())
                     navActions.navigateToHome()

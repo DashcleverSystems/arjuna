@@ -3,8 +3,11 @@ package io.arjuna.websites
 import android.util.Log
 import io.arjuna.logging.ARJUNA_TAG
 import io.arjuna.schedule.domain.ScheduleRepository
+import io.arjuna.schedule.domain.SystemTimeZoneLocalDateTimeProvider
 import io.arjuna.schedule.domain.Time
 import io.arjuna.schedule.domain.Weekday
+import io.arjuna.schedule.domain.isIn
+import io.arjuna.schedule.domain.isWithin
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -16,7 +19,8 @@ private data class WebsitesLock(
 
 class WebsitesService(
     private val scheduleRepository: ScheduleRepository,
-    private val coroutineScope: CoroutineScope
+    private val coroutineScope: CoroutineScope,
+    private val systemTimeProvider: SystemTimeZoneLocalDateTimeProvider
 ) {
 
     fun onUrlChange(
@@ -32,7 +36,7 @@ class WebsitesService(
                     Log.d(ARJUNA_TAG, "Blocked websites is empty. Not blocking $urlChanged")
                     return@collect
                 }
-                if (locks.blocks(urlChanged.url)) {
+                if (locks.block(urlChanged.url)) {
                     Log.d(ARJUNA_TAG, "Blocking: ${urlChanged.url}")
                     onBlockedWebsite.invoke()
                 }
@@ -40,12 +44,19 @@ class WebsitesService(
         }
     }
 
-    private fun Set<WebsitesLock>.blocks(websiteUrl: String): Boolean {
-        return this.any { lock ->
-            lock.websites.any { website ->
-                websiteUrl.contains(website.mainDomain)
-            }
-        }
+    private fun Set<WebsitesLock>.block(websiteUrl: String): Boolean {
+        return this.any { lock -> lock.block(websiteUrl) }
+    }
+
+    private fun WebsitesLock.block(websiteUrl: String): Boolean {
+        val now = systemTimeProvider.provide()
+        return this.websites contains websiteUrl
+                && now.toLocalTime() isWithin this.duration
+                && now.dayOfWeek isIn this.onDays
+    }
+
+    private infix fun Collection<Website>.contains(website: String): Boolean {
+        return this.any { website.contains(it.mainDomain) }
     }
 
     data class UrlChanged(val url: String)

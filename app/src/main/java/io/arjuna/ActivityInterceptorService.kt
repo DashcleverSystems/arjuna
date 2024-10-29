@@ -8,12 +8,19 @@ import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import io.arjuna.apps.AppBlockingService
 import io.arjuna.logging.ARJUNA_TAG
+import io.arjuna.schedule.domain.SystemTimeZoneLocalDateTimeProvider
+import io.arjuna.schedule.infra.proto.ClockSystemTimeZoneLocalDateTimeProvider
 import io.arjuna.schedule.infra.proto.ScheduleRepository
 import io.arjuna.schedule.infra.proto.schedulesStore
 import io.arjuna.websites.WebsitesService
 import io.arjuna.websites.WebsitesService.UrlChanged
+import java.time.Clock
 
 class ActivityInterceptorService : AccessibilityService() {
+
+    private val systemTimeProvider: SystemTimeZoneLocalDateTimeProvider by lazy {
+        ClockSystemTimeZoneLocalDateTimeProvider(Clock.systemDefaultZone())
+    }
 
     private val websitesService by lazy {
         val repository = ScheduleRepository(
@@ -22,7 +29,8 @@ class ActivityInterceptorService : AccessibilityService() {
         )
         WebsitesService(
             repository,
-            DEFAULT_COROUTINE_SCOPE
+            DEFAULT_COROUTINE_SCOPE,
+            systemTimeProvider
         )
     }
 
@@ -31,7 +39,12 @@ class ActivityInterceptorService : AccessibilityService() {
             DEFAULT_COROUTINE_SCOPE,
             baseContext.schedulesStore
         )
-        AppBlockingService(schedulesRepo, DEFAULT_COROUTINE_SCOPE, baseContext.packageManager)
+        AppBlockingService(
+            schedulesRepo,
+            DEFAULT_COROUTINE_SCOPE,
+            baseContext.packageManager,
+            systemTimeProvider
+        )
     }
 
     private val supportedBrowsers = InMemorySupportedBrowserProvider.supportedBrowser
@@ -47,6 +60,7 @@ class ActivityInterceptorService : AccessibilityService() {
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent) {
+
         val packageName = event.packageName.toString()
         appsBlockingService.onAppOpen(packageName) {
             val intent = Intent(this, MainActivity::class.java).apply {
