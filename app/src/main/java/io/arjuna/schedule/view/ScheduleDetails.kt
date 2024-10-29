@@ -295,7 +295,7 @@ class ScheduleDetailsState(
     } ?: Schedule(
         name = this.name,
         websites = this.selectedWebsites,
-        apps = this.installedApps,
+        apps = this.selectedInstalledApps,
         from = this.from,
         to = this.to,
         onDays = this.selectedDays
