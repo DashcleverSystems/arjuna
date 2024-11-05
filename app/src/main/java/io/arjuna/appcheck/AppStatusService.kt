@@ -6,10 +6,11 @@ import android.provider.Settings
 import android.text.TextUtils
 
 class AppStatusService(
+    private val context: Context,
     private val websitesBlockingAccessibilityServiceProvider: () -> Class<*>
 ) {
 
-    fun isAllowedToBlockWebsites(context: Context): Boolean {
+    fun isAllowedToBlockWebsites(): Boolean {
         val appAccessibilityServiceClass = websitesBlockingAccessibilityServiceProvider.invoke()
         val expectedComponentName = ComponentName(context, appAccessibilityServiceClass)
         val enabledServices = Settings.Secure.getString(

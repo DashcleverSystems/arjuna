@@ -1,5 +1,6 @@
 package io.arjuna
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +22,8 @@ private val HOME_ELEMENTS_BASE_MODIFIER = Modifier
 @Composable
 fun HomeComposable(
     isAppAllowedToBlock: Boolean,
+    canOperateFromBackground: Boolean,
+    ifCanNotOperateFromBackground: () -> Unit,
     websites: Set<Website>,
     onWebsiteRemove: (Website) -> Unit,
     onWebsiteAdd: (Website) -> Unit,
@@ -34,7 +37,21 @@ fun HomeComposable(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isAppAllowedToBlock.not()) {
-            Warn(HOME_ELEMENTS_BASE_MODIFIER.align(Alignment.CenterHorizontally))
+            Warn(
+                HOME_ELEMENTS_BASE_MODIFIER.align(Alignment.CenterHorizontally),
+                "Please go to accessibility settings and allow Arjuna"
+            )
+        }
+        if (canOperateFromBackground.not()) {
+            Warn(
+                HOME_ELEMENTS_BASE_MODIFIER
+                    .align(Alignment.CenterHorizontally)
+                    .clickable { ifCanNotOperateFromBackground() },
+                """
+                 Please allow Arjuna to operate from background. 
+                 This requires to allow Arjuna to open new windows while running in the background   
+                """.trimIndent()
+            )
         }
         Websites(
             HOME_ELEMENTS_BASE_MODIFIER.align(Alignment.CenterHorizontally),

@@ -12,7 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Warn(modifier: Modifier) {
+fun Warn(modifier: Modifier, text: String) {
     ElevatedCard(
         modifier,
         colors = CardDefaults.elevatedCardColors().copy(
@@ -23,11 +23,11 @@ fun Warn(modifier: Modifier) {
             text = "App will not block any of your activity!",
             fontWeight = FontWeight.Bold,
             modifier = Modifier
-                .align(Alignment.CenterHorizontally)
+                .align(Alignment.Start)
                 .padding(10.dp)
         )
         Text(
-            "Please go to accessibility settings and allow Arjuna",
+            text,
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(10.dp)
