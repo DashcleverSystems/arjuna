@@ -29,6 +29,8 @@ import java.util.UUID
 @Composable
 fun ArjunaNavGraph(
     isAppAllowedToBlock: Boolean,
+    canAppOperateFromBackground: Boolean,
+    ifCanNotOperateFromBackground: () -> Unit,
     websitesViewModel: WebsitesViewModel,
     schedulesViewModel: SchedulesViewModel,
     installedAppsLoader: InstalledAppsLoader,
@@ -49,6 +51,8 @@ fun ArjunaNavGraph(
             val schedules by schedulesViewModel.schedules.collectAsState(initial = emptySet())
             HomeComposable(
                 isAppAllowedToBlock,
+                canAppOperateFromBackground,
+                ifCanNotOperateFromBackground,
                 websites,
                 onWebsiteRemove = { websitesViewModel.removeWebsiteToBlock(it) },
                 onWebsiteAdd = { websitesViewModel.addWebsiteToBlock(it) },

@@ -1,6 +1,11 @@
 package io.arjuna
 
+import android.app.AppOpsManager
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.Process
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -26,6 +31,8 @@ import io.arjuna.websites.blockedWebsitesStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import java.lang.reflect.Method
+
 
 val DEFAULT_COROUTINE_SCOPE = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
@@ -57,9 +64,13 @@ class MainActivity : ComponentActivity() {
         }
     })
 
-    private val appStatusService = AppStatusService { ActivityInterceptorService::class.java }
+    private val appStatusService by lazy {
+        AppStatusService(application) { ActivityInterceptorService::class.java }
+    }
 
     private var canBlockWebsites by mutableStateOf(false)
+
+    private var canOperateFromBackground by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,6 +91,8 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     ArjunaNavGraph(
                         this.canBlockWebsites,
+                        this.canOperateFromBackground,
+                        { this.goToXiaomiPermissionsSettings() },
                         this.websitesViewModel,
                         this.schedulesViewModel,
                         InstalledAppsLoader(this.baseContext.packageManager),
@@ -93,9 +106,41 @@ class MainActivity : ComponentActivity() {
     }
 
     override fun onResume() {
-        this.canBlockWebsites = appStatusService.isAllowedToBlockWebsites(this.application)
+        this.canBlockWebsites =
+            this.appStatusService.isAllowedToBlockWebsites()
+        this.canOperateFromBackground = this.isBackgroundStartActivityPermissionGranted()
         super.onResume()
     }
 
 }
+
+private fun Context.isBackgroundStartActivityPermissionGranted(): Boolean {
+    try {
+        val mgr = this.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
+        val m: Method = AppOpsManager::class.java.getMethod(
+            "checkOpNoThrow",
+            Int::class.javaPrimitiveType,
+            Int::class.javaPrimitiveType,
+            String::class.java
+        )
+        val result =
+            m.invoke(mgr, OP_BACKGROUND_START_ACTIVITY, Process.myUid(), this.packageName) as Int
+        return result == AppOpsManager.MODE_ALLOWED
+    } catch (e: Exception) {
+        Log.d("Exception", e.toString())
+    }
+    return true
+}
+
+private fun Context.goToXiaomiPermissionsSettings() {
+    val intent = Intent("miui.intent.action.APP_PERM_EDITOR")
+    intent.setClassName(
+        "com.miui.securitycenter",
+        "com.miui.permcenter.permissions.PermissionsEditorActivity"
+    )
+    intent.putExtra("extra_pkgname", this.packageName)
+    startActivity(intent)
+}
+
+const val OP_BACKGROUND_START_ACTIVITY = 10021
 
