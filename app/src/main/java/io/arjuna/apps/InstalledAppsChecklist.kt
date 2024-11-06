@@ -2,18 +2,16 @@ package io.arjuna.apps
 
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,47 +23,40 @@ import androidx.core.graphics.drawable.toBitmap
 
 @Composable
 fun InstalledAppsChecklist(
-    state: InstalledAppsChecklistState,
+    elements: List<InstalledAppsChecklistElement>,
     appIconLoader: (InstalledApp) -> Drawable?,
 ) {
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        state.installedApps.forEach { app ->
-            val isChecked = state.selectedApps.any { it == app }
-            Row(
-                Modifier
-                    .fillMaxWidth(0.9f)
-                    .fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
+    LazyColumn(horizontalAlignment = Alignment.Start) {
+        items(elements) { element ->
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                var isSelected by remember { mutableStateOf(element.isSelected) }
                 Checkbox(
-                    isChecked,
-                    { if (it) state.selectedApps += app else state.selectedApps -= app },
+                    isSelected,
+                    { isSelected = it; element.isSelected = it },
                     Modifier.padding(2.dp)
                 )
                 val appIconImageBitmap =
-                    appIconLoader.invoke(app)?.toBitmap(width = 60, height = 60)
+                    appIconLoader.invoke(element.installedApp)
+                        ?.toBitmap(width = 60, height = 60)
                 appIconImageBitmap?.let {
                     Image(
                         it.asImageBitmap(),
-                        "${app.name} icon",
+                        "${element.installedApp.name} icon",
                         Modifier.padding(2.dp),
                         contentScale = ContentScale.FillBounds
                     )
                 }
-                Text(app.name, Modifier.padding(2.dp), fontWeight = FontWeight.Light)
+                Text(
+                    element.installedApp.name,
+                    Modifier.padding(2.dp),
+                    fontWeight = FontWeight.Light
+                )
             }
         }
     }
 }
 
-class InstalledAppsChecklistState(
-    val installedApps: Set<InstalledApp> = emptySet(),
-    initialSelectedAppNames: Set<InstalledApp> = emptySet()
-) {
-    var selectedApps by mutableStateOf(initialSelectedAppNames)
-}
-
+data class InstalledAppsChecklistElement(
+    val installedApp: InstalledApp,
+    var isSelected: Boolean
+)
