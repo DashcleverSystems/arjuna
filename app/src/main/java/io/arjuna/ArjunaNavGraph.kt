@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -69,7 +70,8 @@ fun ArjunaNavGraph(
                 val schedule: Schedule? by schedulesViewModel.findScheduleById(scheduleId)
                     .collectAsState(initial = null)
                 schedule?.let {
-                    val state = it.toState(websites, installedAppsLoader.getAll())
+                    val installedApps = remember { installedAppsLoader.getAll() }
+                    val state = it.toState(websites, installedApps)
                     ScheduleDetails(state, appIconLoader = installedAppsLoader::getIcon) {
                         schedulesViewModel.save(state.writeTo(schedule))
                         navActions.navigateToHome()

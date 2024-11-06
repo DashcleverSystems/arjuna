@@ -38,7 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import io.arjuna.apps.InstalledApp
-import io.arjuna.apps.InstalledAppsChecklistState
+import io.arjuna.apps.InstalledAppsChecklistElement
 import io.arjuna.apps.SelectAppsDialog
 import io.arjuna.composables.CommonElevatedCardModifier
 import io.arjuna.composables.ElevatedCardTitle
@@ -110,13 +110,16 @@ fun ScheduleDetails(
                     SelectedApp(app, Modifier.align(Alignment.CenterHorizontally))
                 }
 
-                val installedAppsChecklistState = InstalledAppsChecklistState(
-                    state.installedApps,
-                    state.selectedInstalledApps
-                )
+                val installedAppChecklistElements = state.installedApps.map { app ->
+                    InstalledAppsChecklistElement(
+                        app,
+                        state.selectedInstalledApps.any { it == app })
+                }
                 if (showAppsChecklistDialog) {
-                    SelectAppsDialog(installedAppsChecklistState, appIconLoader) {
-                        state.selectedInstalledApps = installedAppsChecklistState.selectedApps
+                    SelectAppsDialog(installedAppChecklistElements, appIconLoader) {
+                        state.selectedInstalledApps =
+                            installedAppChecklistElements.filter { it.isSelected }
+                                .mapTo(mutableSetOf()) { it.installedApp }
                         showAppsChecklistDialog = false
                     }
                 }
